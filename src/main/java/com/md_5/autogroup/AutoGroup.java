@@ -94,6 +94,8 @@ public class AutoGroup extends JavaPlugin {
                     player.sendMessage(ChatColor.GOLD + "You joined the server "
                             + (playerTimes.get(player.getName()).last - playerTimes.get(player.getName()).date) + " seconds ago");
                     player.sendMessage(ChatColor.GOLD + "You must reach " + Config.loyalty + " seconds before you are loyal");
+                    player.sendMessage(ChatColor.GOLD + "You have played for "
+                            + playerTimes.get(player.getName()).time + " seconds in total");
                     break;
                 case 1:
                     if (player.hasPermission("autogroup.playtime.others")) {
@@ -104,6 +106,8 @@ public class AutoGroup extends JavaPlugin {
                         player.sendMessage(ChatColor.GOLD + args[0] + " joined the server "
                                 + (playerTimes.get(args[0]).last - playerTimes.get(args[0]).date) + " seconds ago");
                         player.sendMessage(ChatColor.GOLD + args[0] + " must reach " + Config.loyalty + " seconds before they are loyal");
+                        player.sendMessage(ChatColor.GOLD + args[0] + " has played for "
+                                + playerTimes.get(args[0]).time + " seconds in total");
                     } else {
                         player.sendMessage("You can only view your own time. Run this command without arguments");
                     }
