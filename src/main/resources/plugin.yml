@@ -5,7 +5,6 @@ author: md_5
 website: https://github.com/md-5/AutoGroup
 
 main: com.md_5.autogroup.AutoGroup
-depend: [PermissionsBukkit]
 
 commands:
   donate:

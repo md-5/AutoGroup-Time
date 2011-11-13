@@ -10,9 +10,6 @@ password: AutoGroup
 table: donators
 table2: players
 
-# Set to true if players belong to more than 1 group
-addGroup: false
-
 # Promotion command.
 # %1$s == glayername
 # %2$s == group
