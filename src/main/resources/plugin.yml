@@ -1,5 +1,5 @@
 name: AutoGroup
-version: 1.0
+version: 1.1
 description: Bukkit plugin to automatically group users based on the time they have spent online and donation amounts.
 author: md_5
 website: https://github.com/md-5/AutoGroup
@@ -25,4 +25,7 @@ permissions:
         default: true
     autogroup.playtime.others:
         description: Allows use of the playtime command on others
+        default: op
+    autogroup.norank:
+        description: Prevents player from being ranked
         default: op
