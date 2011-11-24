@@ -12,8 +12,8 @@ public class Ticker implements Runnable {
                 AutoGroup.playerTimes.put(name, new Map(0, (int) (System.currentTimeMillis() / 1000L), 0));
                 Database.add(name);
             }
-            AutoGroup.playerTimes.get(name).time += Config.interval;
-            AutoGroup.playerTimes.get(name).last = (int) (System.currentTimeMillis() / 1000L);
+            AutoGroup.playerTimes.get(name).setTime(AutoGroup.playerTimes.get(name).getTime() + Config.interval);
+            AutoGroup.playerTimes.get(name).setLast((int) (System.currentTimeMillis() / 1000L));
             Promote.checkPromote(name);
         }
     }

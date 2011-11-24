@@ -18,7 +18,7 @@ public final class Database {
             ResultSet rs = stat.executeQuery("select * from players WHERE name='" + player + "'");
             while (rs.next()) {
                 Map map = new Map(rs.getInt("time"), rs.getInt("date"), rs.getInt("last"));
-                map.status = rs.getString("status");
+                map.setStatus(rs.getString("status"));
                 AutoGroup.playerTimes.put(rs.getString("name"), map);
             }
             stat.close();
@@ -27,11 +27,11 @@ public final class Database {
         } catch (ClassNotFoundException e) {
             Errors.classNotFound();
         } catch (SQLException e) {
-            if (Config.debug) {
+            //if (Config.debug) {
                 e.printStackTrace();
-            } else {
+           // } else {
                 Errors.SQLException();
-            }
+            //}
         }
         return true;
     }
@@ -43,8 +43,7 @@ public final class Database {
             Statement stat = conn.createStatement();
             for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                 String name = player.getName();
-                AutoGroup.playerTimes.put(name, new Map(AutoGroup.playerTimes.get(name).time,
-                        AutoGroup.playerTimes.get(name).date, (int) (System.currentTimeMillis() / 1000L)));
+                AutoGroup.playerTimes.get(name).setLast((int) (System.currentTimeMillis() / 1000L));
                 Database.update(name);
             }
             for (String player : AutoGroup.playerTimes.keySet()) {
@@ -69,7 +68,7 @@ public final class Database {
             Class.forName("org.sqlite.JDBC");
             Connection conn = DriverManager.getConnection("jdbc:sqlite:plugins/AutoGroup/users.db");
             Statement stat = conn.createStatement();
-            stat.executeUpdate("insert into players values ('" + player + "',0," + AutoGroup.playerTimes.get(player).date + ", 0, '')");
+            stat.executeUpdate("insert into players values ('" + player + "',0," + AutoGroup.playerTimes.get(player).getDate() + ", 0, '')");
             stat.close();
             conn.close();
         } catch (ClassNotFoundException e) {
@@ -89,9 +88,9 @@ public final class Database {
             Class.forName("org.sqlite.JDBC");
             Connection conn = DriverManager.getConnection("jdbc:sqlite:plugins/AutoGroup/users.db");
             Statement stat = conn.createStatement();
-            stat.executeUpdate("update players set time=" + AutoGroup.playerTimes.get(player).time
-                    + ", last=" + AutoGroup.playerTimes.get(player).last + ", status='"
-                    + AutoGroup.playerTimes.get(player).status
+            stat.executeUpdate("update players set time=" + AutoGroup.playerTimes.get(player).getTime()
+                    + ", last=" + AutoGroup.playerTimes.get(player).getLast() + ", status='"
+                    + AutoGroup.playerTimes.get(player).getStatus()
                     + "' WHERE name='" + player + "'");
             stat.close();
             conn.close();
