@@ -3,9 +3,9 @@ error_reporting(E_ALL);
 
 //Edit these to match your configuration
 $host = "localhost";
-$username = "AutoGroup";
-$password = "AutoGroup";
-$database = "AutoGroup";
+$username = "minecraft";
+$password = "minecraft";
+$database = "minecraft";
 $table = "donators";
 $table2 = "players";
 $myemail = "YOUR EMAIL HERE";

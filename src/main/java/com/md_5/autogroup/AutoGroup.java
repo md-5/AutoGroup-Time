@@ -21,7 +21,7 @@ public class AutoGroup extends JavaPlugin {
     static FileConfiguration config;
 
     public void onEnable() {
-//herp
+
         PluginManager pm = this.getServer().getPluginManager();
 
         WorldListener worldListener = new WorldListener(this);
