@@ -9,11 +9,11 @@ public class Ticker implements Runnable {
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
             String name = player.getName();
             if (!AutoGroup.playerTimes.containsKey(name)) {
-                AutoGroup.playerTimes.put(name, new Map(0, (int) (System.currentTimeMillis() / 1000L), 0));
+                AutoGroup.playerTimes.put(name, new Map(0, System.currentTimeMillis(), 0));
                 Database.add(name);
             }
             AutoGroup.playerTimes.get(name).setTime(AutoGroup.playerTimes.get(name).getTime() + Config.interval);
-            AutoGroup.playerTimes.get(name).setLast((int) (System.currentTimeMillis() / 1000L));
+            AutoGroup.playerTimes.get(name).setLast(System.currentTimeMillis());
             Promote.checkPromote(name);
         }
     }

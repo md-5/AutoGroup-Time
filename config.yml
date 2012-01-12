@@ -1,0 +1,24 @@
+debug: true
+
+# MYSQL Database Information
+# Use either mysql or sqlite for connectionType
+connectionType: sqlite
+mysqlURL: 127.0.0.1
+dbName: AutoGroup
+username: AutoGroup
+password: AutoGroup
+
+
+# Promotion command.
+# %1$s == glayername
+# %2$s == group
+command: permissions player setgroup %1$s %2$s
+
+# The interval between checking players times
+# Seconds per month and year were taken from google.
+interval: 60
+
+groups:
+    Addict1: 3600
+    Addict2: 36000
+    Addict3: 360000
