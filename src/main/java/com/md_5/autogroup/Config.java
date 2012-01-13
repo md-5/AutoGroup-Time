@@ -12,6 +12,7 @@ public class Config {
     public static String table = "donators";
     public static String table2 = "players";
     public static String command = "permissions player setgroup %1$s %2$s";
+    public static String promotionType ="seconds";
     
 }
 

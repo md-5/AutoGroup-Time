@@ -3,11 +3,11 @@ package com.md_5.autogroup;
 public class Map {
 
     private int time; //time in seconds they have been on server
-    private long date; //first time they joined
-    private long last; //last time they were on
+    private int date; //first time they joined
+    private int last; //last time they were on
     private String status = "";//what group do they have (not used right now
 
-    public Map(int time, long date, int last) {
+    public Map(int time, int date, int last) {
         this.time = time;
         this.date = date;
         this.last = last;
@@ -21,20 +21,20 @@ public class Map {
         this.time = time;
     }
 
-    public long getDate() {
+    public int getDate() {
         return date;
     }
 
     public void setDate(long date) {
-        this.date = date;
+        this.date = (int) date;
     }
 
-    public long getLast() {
+    public int getLast() {
         return last;
     }
 
     public void setLast(long last) {
-        this.last = last;
+        this.last = (int) last;
     }
 
     public String getStatus() {

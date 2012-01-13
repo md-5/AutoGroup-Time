@@ -44,6 +44,7 @@ public class AutoGroup extends JavaPlugin{
         Config.userName = config.getString("username", Config.userName);
         Config.password = config.getString("password", Config.password);
         Config.command = config.getString("command", Config.command);
+        Config.promotionType = config.getString("promotionType", Config.promotionType);
 
         groupConfig.putAll(config.getConfigurationSection("groups").getValues(false));
         
@@ -88,7 +89,7 @@ public class AutoGroup extends JavaPlugin{
                     player.sendMessage(ChatColor.GOLD + "You joined the server on " + ChatColor.DARK_GREEN
                     		+ formattedDate(playerTimes.get(player.getName()).getDate()) + ChatColor.GOLD);
                     player.sendMessage(ChatColor.GOLD + "which was " + ChatColor.DARK_GREEN
-                            + elapsedDate((playerTimes.get(player.getName()).getLast() - playerTimes.get(player.getName()).getDate()))
+                            + elapsedTime(playerTimes.get(player.getName()).getDate() , ((int) (System.currentTimeMillis() / 1000L)))
                             + ChatColor.GOLD + " ago");;
                     
 
@@ -101,11 +102,20 @@ public class AutoGroup extends JavaPlugin{
                     			status = t;
                     		}
                     	}
-                   
-                    player.sendMessage(ChatColor.DARK_GREEN + formattedSeconds(groupTime - playerTimes.get(player.getName()).getTime()) 
-                    		+ ChatColor.GOLD + " before you reach the rank of " + ChatColor.RED + status);
-                    player.sendMessage(ChatColor.GOLD + "You have played for " + ChatColor.DARK_GREEN
-                    		+ formattedSeconds(playerTimes.get(player.getName()).getTime()) + ChatColor.GOLD + " in total");
+                    if (Config.promotionType.equalsIgnoreCase("seconds")){
+                    	if (status == ""){
+                    		player.sendMessage(ChatColor.GOLD  + "You have already achieved the highest rank.");
+                    	}else
+                    		player.sendMessage(ChatColor.DARK_GREEN + elapsedTime(playerTimes.get(player.getName()).getTime() , groupTime) 
+                    				+ ChatColor.GOLD + " before you reach the rank of " + ChatColor.RED + status);
+                    	player.sendMessage(ChatColor.GOLD + "You have played for " + ChatColor.DARK_GREEN
+                    			+ elapsedTime(0 , playerTimes.get(player.getName()).getTime()) + ChatColor.GOLD + " in total");
+                    }else if(Config.promotionType.equalsIgnoreCase("days")){
+                    	player.sendMessage(ChatColor.DARK_GREEN + "" + (groupTime - playerTimes.get(player.getName()).getTime())
+                    			+ ChatColor.GOLD + " day(s) before you reach the rank of " + ChatColor.RED + status);
+                    	player.sendMessage(ChatColor.GOLD + "You have logged into this server " + ChatColor.DARK_GREEN
+                    			+ playerTimes.get(player.getName()).getTime() + ChatColor.GOLD + " day(s)");
+                    }
                     break;
                     }
                 case 1:
@@ -117,7 +127,7 @@ public class AutoGroup extends JavaPlugin{
                         player.sendMessage(ChatColor.GOLD + args[0] + " joined the server on "+ ChatColor.DARK_GREEN
                         		+ formattedDate(playerTimes.get(args[0]).getDate()) + ChatColor.GOLD); 
                         		player.sendMessage(ChatColor.GOLD + "which was " + ChatColor.DARK_GREEN
-                                + elapsedDate((playerTimes.get(args[0]).getLast() - playerTimes.get(args[0]).getDate())) 
+                                + elapsedTime(playerTimes.get(args[0]).getDate() , ((int) (System.currentTimeMillis() / 1000L))) 
                                 + ChatColor.GOLD + " ago");
                        
                         for (String s : groupConfig.keySet()){
@@ -130,11 +140,24 @@ public class AutoGroup extends JavaPlugin{
                         		}
                         	}
                         }
-
-                        	player.sendMessage(ChatColor.GOLD + args[0] + " must play "+ ChatColor.DARK_GREEN + formattedSeconds(groupTime - playerTimes.get(args[0]).getTime())
-                        			+ ChatColor.GOLD + " before they reach the rank of " + ChatColor.RED + status);
-                        player.sendMessage(ChatColor.GOLD + args[0] + " has played for " + ChatColor.DARK_GREEN
-                                + formattedSeconds(playerTimes.get(player.getName()).getTime()) + ChatColor.GOLD + " in total");
+                        if (Config.promotionType.equalsIgnoreCase("seconds")){
+                        	if (status == ""){
+                        		player.sendMessage(ChatColor.GOLD + args[0] + " has already achieved the highest rank.");
+                        	}else
+                        		player.sendMessage(ChatColor.GOLD + args[0] + " must play "+ ChatColor.DARK_GREEN + elapsedTime(playerTimes.get(args[0]).getTime() , groupTime)
+                        				+ ChatColor.GOLD + " before they reach the rank of " + ChatColor.RED + status);
+                        	player.sendMessage(ChatColor.GOLD + args[0] + " has played for " + ChatColor.DARK_GREEN
+                        			+ elapsedTime(0 , playerTimes.get(player.getName()).getTime()) + ChatColor.GOLD + " in total");
+                        }
+                        else if(Config.promotionType.equalsIgnoreCase("days")){
+                        	if (status == null){
+                        		player.sendMessage(ChatColor.GOLD + args[0] + " has already achieved the highest rank.");
+                        	}else
+                        		player.sendMessage(ChatColor.DARK_GREEN + "" + (groupTime - playerTimes.get(player.getName()).getTime())
+                        				+ ChatColor.GOLD + " day(s) before " + args[0] +  " reach the rank of " + ChatColor.RED + status);
+                        	player.sendMessage(ChatColor.GOLD + args[0] + " has logged into this server " + ChatColor.DARK_GREEN
+                        			+ playerTimes.get(player.getName()).getTime() + ChatColor.GOLD + " day(s)");
+                        }
                     } else if (!player.hasPermission("autogroup.playtime.others")) {
                         player.sendMessage("You can only view your own time. Run this command without arguments");
                     }
@@ -151,93 +174,49 @@ public class AutoGroup extends JavaPlugin{
         return true;
     }
     
-public String formattedSeconds(int seconds){
-    	
-    	
-    	int year;
-    	int month;
-    	int day;
-    	int hour;
-    	int minute;
-    	
-		if (seconds >= 31556926){
-    		year= (int) (seconds/31556926);
-    		seconds = (int) (seconds % 31556926);
-    	}
-    	else 
-    		year=0;
-		if (seconds >= 2629743.83){
-    		month = (int) (seconds / 2629743.83);
-    		seconds = (int) (seconds % 2629743.83);
-    	}
-    	else 
-    		month=0;
-		if (seconds >= 86400){
-    		day=(int) (seconds / 86400);
-    		seconds = (int) (seconds % 86400);
-    	}
-    	else
-    		day=0;
-		if (seconds >= 3600){
-    		hour=(int) (seconds / 3600);
-    		seconds = (int) (seconds % 3600);
-    	}
-    	else
-    		hour=0;
-		if (seconds >= 60){
-    		minute=(int) (seconds/60);
-    		seconds = (int) (seconds % 60);
-    	}
-    	else minute=0;
-		String formatted= seconds + "s";
-		if (minute>0){
-			formatted= minute + "m " + formatted;
-			if(hour > 0){
-				formatted = hour + "h " + formatted;
-				if (day > 0){
-					formatted = day + "d " + formatted;
-					if (month > 0){
-						formatted = month + "m " + formatted;
-						if (year > 0){
-							formatted = year + "y " + formatted;
-						}
-					}
-				}
-			}
-		}
-    	return formatted;
-    	
-    }
 
-	public String formattedDate(long seconds){
+	public String formattedDate(int seconds){
 		String months[] = {
 				"Jan", "Feb", "Mar", "Apr",
 				"May", "Jun", "Jul", "Aug",
 				"Sep", "Oct", "Nov", "Dec"}; 
 		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(seconds);
+		cal.setTimeInMillis(seconds * 1000L);
 		return months[cal.get(Calendar.MONTH)] + " " + cal.get(Calendar.DATE) + ", " + cal.get(Calendar.YEAR) + ", "
 			+ cal.get(Calendar.HOUR_OF_DAY)	+ ":" + cal.get(Calendar.MINUTE);
 	}
-	 public String elapsedDate(long seconds){
-		 	Calendar cal = Calendar.getInstance();
-			cal.setTimeInMillis(seconds);
-			String formatted= cal.get(Calendar.SECOND) + "s";
-			if (cal.get(Calendar.MINUTE)>0){
-				formatted= cal.get(Calendar.MINUTE) + "m " + formatted;
-				if(cal.get(Calendar.HOUR_OF_DAY) > 0){
-					formatted = cal.get(Calendar.HOUR_OF_DAY) + "h " + formatted;
-					if (cal.get(Calendar.DATE) > 0){
-						formatted = cal.get(Calendar.DATE) + "d " + formatted;
-						if (cal.get(Calendar.MONTH) + 1 > 0 ){
-							formatted = cal.get(Calendar.MONTH) + 1 + "m " + formatted;
-							if (cal.get(Calendar.YEAR) > 0){
-								formatted = cal.get(Calendar.YEAR) + "y " + formatted;
+	 public String elapsedTime(int before, int after){
+		 	Calendar beforeCal = Calendar.getInstance();
+			beforeCal.setTimeInMillis(before * 1000L);
+			Calendar afterCal = Calendar.getInstance();
+			afterCal.setTimeInMillis(after * 1000L);
+			
+			int year = Math.abs(afterCal.get(Calendar.YEAR) - beforeCal.get(Calendar.YEAR));
+	    	int month = Math.abs(afterCal.get(Calendar.MONTH) - beforeCal.get(Calendar.MONTH));
+	    	int date = Math.abs(afterCal.get(Calendar.DATE) - beforeCal.get(Calendar.DATE));
+	    	int hour = Math.abs(afterCal.get(Calendar.HOUR_OF_DAY) - beforeCal.get(Calendar.HOUR_OF_DAY));
+	    	int minute = Math.abs(afterCal.get(Calendar.MINUTE) - beforeCal.get(Calendar.MINUTE));
+	    	
+			String formatted= Math.abs(afterCal.get(Calendar.SECOND) - beforeCal.get(Calendar.SECOND)) + "s";
+			
+			if (minute > 0 || hour > 0 || date > 0 || month > 0 || year > 0){
+				formatted= minute + "m " + formatted;
+				if(hour > 0 || date > 0 || month > 0 || year > 0){
+					formatted = hour + "h " + formatted;
+					if (date > 0 || month > 0 || year > 0){
+						formatted = date + "d " + formatted;
+						if (month > 0 || year > 0){
+							formatted = month + "m " + formatted;
+							if (year > 0){
+								formatted = year + "y " + formatted;
 							}
 						}
 					}
 				}
 			}
+
 	    	return formatted;
 	 }
+	
+
 	}

@@ -167,7 +167,7 @@ public final class Database {
             Class.forName("org.sqlite.JDBC");
             Connection conn = DriverManager.getConnection("jdbc:sqlite:plugins/AutoGroup/users.db");
             Statement stat = conn.createStatement();
-            stat.executeUpdate("create table if not exists AutoGroup (name text, time numeric, date bigint unsigned, last bigint unsigned, status text)");
+            stat.executeUpdate("create table if not exists AutoGroup (name text, time numeric, date numeric, last numeric, status text)");
             stat.close();
             conn.close();
             for (Player player : Bukkit.getServer().getOnlinePlayers()) {
@@ -178,7 +178,7 @@ public final class Database {
         		Class.forName("com.mysql.jdbc.Driver");
                 Connection conn = DriverManager.getConnection("jdbc:mysql://" + Config.url + "/" + Config.dbName, Config.userName, Config.password);
                 Statement stat = conn.createStatement();
-                stat.executeUpdate("create table if not exists AutoGroup (name text, time numeric, date bigint unsigned, last bigint unsigned, status text)");
+                stat.executeUpdate("create table if not exists AutoGroup (name text, time numeric, date numeric, last numeric, status text)");
                 stat.close();
                 conn.close();
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {

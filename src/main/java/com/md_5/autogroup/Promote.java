@@ -23,7 +23,7 @@ public class Promote {
         	}
         
         }
-        if (groupTime!=0 && status !="")
+        if (groupTime!=0 && status != "")
         	promotePlayer(player, status);
         
         Database.update(player);
