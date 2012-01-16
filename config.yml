@@ -15,14 +15,12 @@ password: AutoGroup
 command: permissions player setgroup %1$s %2$s
 
 # The interval between checking players times
-# Seconds per month and year were taken from google.
 interval: 60
 
 # Valid values are seconds and days.
 # Days keeps track of the number of days you visited the server.
+# So after having visited the server on x different days you get promoted.
 promotionType: seconds
 
 groups:
-    Addict1: 3600
-    Addict2: 36000
-    Addict3: 360000
+    Addict1: 0

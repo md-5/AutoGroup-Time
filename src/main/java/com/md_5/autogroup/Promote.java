@@ -8,14 +8,13 @@ public class Promote {
 	
 
     public static void checkPromote(String player) {
-        int time = AutoGroup.playerTimes.get(player).getTime();
         int groupTime=0;
         String status = "";
 
         for (String s : AutoGroup.groupConfig.keySet()){
         	groupTime=Integer.parseInt(AutoGroup.groupConfig.get(s).toString());
         	for (String t : AutoGroup.groupConfig.keySet()){
-        		if (time >= Integer.parseInt(AutoGroup.groupConfig.get(t).toString())
+        		if (AutoGroup.playerTimes.get(player).getTime() >= Integer.parseInt(AutoGroup.groupConfig.get(t).toString())
         				&& groupTime <= Integer.parseInt(AutoGroup.groupConfig.get(t).toString())){
         			groupTime=Integer.parseInt(AutoGroup.groupConfig.get(t).toString());
         			status = t;

@@ -34,7 +34,10 @@ public class AutoGroup extends JavaPlugin{
         playerListener.registerEvents(pm);
 
         config = getConfig();
-        config.options().copyDefaults(true);
+        if (!config.contains("groups"))
+        	config.options().copyDefaults(true);
+        else
+        	config.options().copyDefaults(false);
         saveConfig();
         Config.debug = config.getBoolean("debug", Config.debug);
         Config.interval = config.getInt("interval", Config.interval);
