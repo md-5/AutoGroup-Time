@@ -190,9 +190,9 @@ public class AutoGroup extends JavaPlugin{
 	}
 	 public String elapsedTime(int before, int after){
 		 	Calendar beforeCal = Calendar.getInstance();
-			beforeCal.setTimeInMillis(before * 1000L);
+			beforeCal.setTimeInMillis(0);
 			Calendar afterCal = Calendar.getInstance();
-			afterCal.setTimeInMillis(after * 1000L);
+			afterCal.setTimeInMillis((after - before) * 1000L);
 			
 			int year = Math.abs(afterCal.get(Calendar.YEAR) - beforeCal.get(Calendar.YEAR));
 	    	int month = Math.abs(afterCal.get(Calendar.MONTH) - beforeCal.get(Calendar.MONTH));

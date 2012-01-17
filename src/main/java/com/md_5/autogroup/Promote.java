@@ -22,7 +22,7 @@ public class Promote {
         	}
         
         }
-        if (groupTime!=0 && status != "")
+        if (groupTime!=0 && status != "" && status != AutoGroup.playerTimes.get(player).getStatus())
         	promotePlayer(player, status);
         
         Database.update(player);
