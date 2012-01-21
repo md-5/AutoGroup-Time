@@ -9,21 +9,21 @@ public class Promote {
 
     public static void checkPromote(String player) {
         int groupTime=0;
-        String status = "";
+        String groupName = "";
 
-        for (String s : AutoGroup.groupConfig.keySet()){
-        	groupTime=Integer.parseInt(AutoGroup.groupConfig.get(s).toString());
-        	for (String t : AutoGroup.groupConfig.keySet()){
-        		if (AutoGroup.playerTimes.get(player).getTime() >= Integer.parseInt(AutoGroup.groupConfig.get(t).toString())
-        				&& groupTime <= Integer.parseInt(AutoGroup.groupConfig.get(t).toString())){
-        			groupTime=Integer.parseInt(AutoGroup.groupConfig.get(t).toString());
-        			status = t;
+        if (AutoGroup.groupTimes.size() == 1){
+        	groupName = AutoGroup.groupNames.get(0);
+        	groupTime = AutoGroup.groupTimes.get(0);
+        }else {                    	
+        	for (int i=0; i < AutoGroup.groupTimes.size(); i++){
+        		if (AutoGroup.groupTimes.get(i) <= AutoGroup.playerTimes.get(player).getTime()){
+        			groupName = AutoGroup.groupNames.get(i);
+                	groupTime = AutoGroup.groupTimes.get(i);
         		}
         	}
-        
         }
-        if (groupTime!=0 && status != "" && status != AutoGroup.playerTimes.get(player).getStatus())
-        	promotePlayer(player, status);
+        if (groupTime!=0 && groupName != "" && groupName != AutoGroup.playerTimes.get(player).getStatus())
+        	promotePlayer(player, groupName);
         
         Database.update(player);
         return;

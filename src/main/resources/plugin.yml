@@ -19,6 +19,9 @@ permissions:
     autogroup.playtime.others:
         description: Allows use of the playtime command on others
         default: op
+        autogroup.playtime.settime:
+        description: Allows use of the playtime command on others
+        default: op
     autogroup.norank:
         description: Prevents player from being ranked
         default: op
