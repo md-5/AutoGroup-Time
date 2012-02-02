@@ -19,7 +19,7 @@
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.0.1-R2-SNAPSHOT</version>
+            <version>1.1-R4-SNAPSHOT</version>
         </dependency>
         <dependency>
         	<groupId>joda-time</groupId>
@@ -28,35 +28,32 @@
         </dependency>
     </dependencies>
   	<build>
-		<plugins>
-			<plugin>
-			<groupId>org.apache.maven.plugins</groupId>
-        	<artifactId>maven-jar-plugin</artifactId>
-        	<configuration>
-          		<archive>
-            		<manifest>
-              			<addClasspath>true</addClasspath>
-              			<classpathPrefix>lib/</classpathPrefix>
-              			<customClasspathLayout>WEB-INF/lib/$${artifact.artifactId}-$${artifact.version}$${dashClassifier?}.$${artifact.extension}</customClasspathLayout>
-             		 </manifest>
-          		</archive>
-        	</configuration>
+  	    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>1.5</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <artifactSet>
+                <excludes>
+                  <exclude>classworlds:classworlds</exclude>
+                  <exclude>junit:junit</exclude>
+                  <exclude>jmock:*</exclude>
+                  <exclude>*:xml-apis</exclude>
+                  <exclude>org.apache.maven:lib:tests</exclude>
+                  <exclude>org.bukkit</exclude>
+                </excludes>
+              </artifactSet>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<finalName>uber-${artifactId}-${version}</finalName>
-				</configuration>
-			</plugin>
-		</plugins>
+    </plugins>
 	</build>
 </project>

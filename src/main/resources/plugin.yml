@@ -10,8 +10,8 @@ commands:
   playtime:
     description: View how long a player has been playing for and time until next rank
     aliases: play
-    permission: autogroup.playtime
-    
+    permission: autogroup.playtime 
+
 permissions:
     autogroup.playtime:
         description: Allows use of the playtime command
@@ -19,7 +19,7 @@ permissions:
     autogroup.playtime.others:
         description: Allows use of the playtime command on others
         default: op
-        autogroup.playtime.settime:
+    autogroup.playtime.settime:
         description: Allows use of the playtime command on others
         default: op
     autogroup.norank:

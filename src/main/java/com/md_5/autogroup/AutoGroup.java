@@ -14,7 +14,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.joda.time.Period;
+import com.joda.time.Period;
 
 import com.md_5.autogroup.events.PlayerListener;
 import com.md_5.autogroup.events.WorldListener;
@@ -136,7 +136,7 @@ public class AutoGroup extends JavaPlugin{
                     break;
                     
                 case 1:
-                    if (player.hasPermission("autogroup.playtime.others") && args.length > 0) {
+                    if (player.hasPermission("autogroup.playtime.others") && args.length == 1) {
                         if (!playerTimes.containsKey(args[0])) {
                             player.sendMessage("That player does not exist!");
                             return true;
@@ -183,9 +183,9 @@ public class AutoGroup extends JavaPlugin{
                     break;
                     
                 case 3:
-                	if (player.hasPermission("autogroup.playtime.settime") && args.length == 1) {
+                	if (player.hasPermission("autogroup.playtime.settime") && args.length == 2) {
                 		if (!playerTimes.containsKey(args[0])) {
-                            player.sendMessage("That player does not exist!");
+                            player.sendMessage("That player does not exist, or is not online!");
                             return true;
                         }
                 		try {
