@@ -41,11 +41,11 @@ public final class Database {
         } catch (ClassNotFoundException e) {
             Errors.classNotFound();
         } catch (SQLException e) {
-            //if (Config.debug) {
+            if (Config.debug) {
                 e.printStackTrace();
-           // } else {
+           } else {
                 Errors.SQLException();
-            //}
+           }
         }
         return true;
     }
@@ -167,7 +167,8 @@ public final class Database {
             Class.forName("org.sqlite.JDBC");
             Connection conn = DriverManager.getConnection("jdbc:sqlite:plugins/AutoGroup/users.db");
             Statement stat = conn.createStatement();
-            stat.executeUpdate("create table if not exists AutoGroup (name text, time numeric, date numeric, last numeric, status text)");
+            stat.executeUpdate("create table if not exists AutoGroup (`name` text NOT NULL, `time` int(10) unsigned NOT NULL DEFAULT '0', `date` "
+            		+ "int(10) unsigned NOT NULL DEFAULT '0', `last` int(10) unsigned NOT NULL DEFAULT '0', `status` text, PRIMARY KEY (`name`(20)))");
             stat.close();
             conn.close();
             for (Player player : Bukkit.getServer().getOnlinePlayers()) {
@@ -178,7 +179,8 @@ public final class Database {
         		Class.forName("com.mysql.jdbc.Driver");
                 Connection conn = DriverManager.getConnection("jdbc:mysql://" + Config.url + "/" + Config.dbName, Config.userName, Config.password);
                 Statement stat = conn.createStatement();
-                stat.executeUpdate("create table if not exists AutoGroup (name text, time numeric, date numeric, last numeric, status text)");
+                stat.executeUpdate("create table if not exists AutoGroup (`name` text NOT NULL, `time` int(10) unsigned NOT NULL DEFAULT '0', `date` "
+                		+ "int(10) unsigned NOT NULL DEFAULT '0', `last` int(10) unsigned NOT NULL DEFAULT '0', `status` text, PRIMARY KEY (`name`(20)))");
                 stat.close();
                 conn.close();
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {

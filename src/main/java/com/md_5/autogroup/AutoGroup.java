@@ -1,7 +1,6 @@
 package com.md_5.autogroup;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.logging.Logger;
@@ -14,8 +13,11 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import com.joda.time.Period;
 
+import com.joda.time.DateTime;
+import com.joda.time.Period;
+import com.joda.time.format.DateTimeFormat;
+import com.joda.time.format.DateTimeFormatter;
 import com.md_5.autogroup.events.PlayerListener;
 import com.md_5.autogroup.events.WorldListener;
 
@@ -136,12 +138,12 @@ public class AutoGroup extends JavaPlugin{
                     break;
                     
                 case 1:
-                    if (player.hasPermission("autogroup.playtime.others") && args.length == 1) {
+                    if (player.hasPermission("autogroup.playtime.others")) {
                         if (!playerTimes.containsKey(args[0])) {
                             player.sendMessage("That player does not exist!");
                             return true;
                         }
-                        player.sendMessage(ChatColor.GOLD + args[0] + " joined the server on "+ ChatColor.DARK_GREEN
+                        player.sendMessage(ChatColor.RED + args[0] + ChatColor.GOLD + " joined the server on "+ ChatColor.DARK_GREEN
                         		+ formattedDate(playerTimes.get(args[0]).getDate()) + ChatColor.GOLD); 
                         		player.sendMessage(ChatColor.GOLD + "which was " + ChatColor.DARK_GREEN
                                 + elapsedTime(playerTimes.get(args[0]).getDate() , ((int) (System.currentTimeMillis() / 1000L))) 
@@ -163,9 +165,9 @@ public class AutoGroup extends JavaPlugin{
                         	if (groupName == ""){
                         		player.sendMessage(ChatColor.GOLD + args[0] + " has already achieved the highest rank.");
                         	}else
-                        		player.sendMessage(ChatColor.GOLD + args[0] + " must play "+ ChatColor.DARK_GREEN + elapsedTime(playerTimes.get(args[0]).getTime() , groupTime)
-                        				+ ChatColor.GOLD + " before they reach the rank of " + ChatColor.RED + groupName);
-                        	player.sendMessage(ChatColor.GOLD + args[0] + " has played for " + ChatColor.DARK_GREEN
+                        		player.sendMessage(ChatColor.RED + args[0] + ChatColor.GOLD + " must play "+ ChatColor.DARK_GREEN + elapsedTime(playerTimes.get(args[0]).getTime() , groupTime));
+                        		player.sendMessage(ChatColor.GOLD + "before they reach the rank of " + ChatColor.RED + groupName);
+                        		player.sendMessage(ChatColor.GOLD + args[0] + " has played for " + ChatColor.DARK_GREEN
                         			+ elapsedTime(0 , playerTimes.get(player.getName()).getTime()) + ChatColor.GOLD + " in total");
                         }
                         else if(Config.promotionType.equalsIgnoreCase("days")){
@@ -182,15 +184,15 @@ public class AutoGroup extends JavaPlugin{
                     }
                     break;
                     
-                case 3:
-                	if (player.hasPermission("autogroup.playtime.settime") && args.length == 2) {
+                case 2:
+                	if (player.hasPermission("autogroup.playtime.settime")) {
                 		if (!playerTimes.containsKey(args[0])) {
                             player.sendMessage("That player does not exist, or is not online!");
                             return true;
                         }
                 		try {
                 			playerTimes.get(args[0]).setTime(Integer.parseInt(args[1]));
-                			player.sendMessage(ChatColor.RED + args[0] + ChatColor.GOLD +"'s time has been set to " + args[1] + " " + elapsedTime(0,Integer.parseInt(args[1])));
+                			player.sendMessage(ChatColor.RED + args[0] + ChatColor.GOLD +"'s time has been set to " + " " + elapsedTime(0,Integer.parseInt(args[1])));
                 		}
                 		catch (NumberFormatException e){
                 			player.sendMessage("That is not a valid number");
@@ -215,58 +217,22 @@ public class AutoGroup extends JavaPlugin{
     
 
 	public String formattedDate(int seconds){
-		String months[] = {
-				"Jan", "Feb", "Mar", "Apr",
-				"May", "Jun", "Jul", "Aug",
-				"Sep", "Oct", "Nov", "Dec"}; 
-		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(seconds * 1000L);
-		return months[cal.get(Calendar.MONTH)] + " " + cal.get(Calendar.DATE) + ", " + cal.get(Calendar.YEAR) + ", "
-			+ cal.get(Calendar.HOUR_OF_DAY)	+ ":" + cal.get(Calendar.MINUTE);
+		DateTime cal = new DateTime(seconds * 1000L);
+		DateTimeFormatter fmt = DateTimeFormat.forPattern("MMM dd, yyyy, hh:mm");
+		return cal.toString(fmt);
 	}
-	/* public String elapsedTime(int before, int after){
-		 	Calendar beforeCal = Calendar.getInstance();
-			beforeCal.setTimeInMillis(0);
-			Calendar afterCal = Calendar.getInstance();
-			afterCal.setTimeInMillis((after - before) * 1000L);
-			
-			int year = Math.abs(afterCal.get(Calendar.YEAR) - beforeCal.get(Calendar.YEAR));
-	    	int month = Math.abs(afterCal.get(Calendar.MONTH) - beforeCal.get(Calendar.MONTH));
-	    	int date = Math.abs(afterCal.get(Calendar.DATE) - beforeCal.get(Calendar.DATE));
-	    	int hour = Math.abs(afterCal.get(Calendar.HOUR_OF_DAY) - beforeCal.get(Calendar.HOUR_OF_DAY));
-	    	int minute = Math.abs(afterCal.get(Calendar.MINUTE) - beforeCal.get(Calendar.MINUTE));
-	    	
-			String formatted= Math.abs(afterCal.get(Calendar.SECOND) - beforeCal.get(Calendar.SECOND)) + "s";
-			
-			if (minute > 0 || hour > 0 || date > 0 || month > 0 || year > 0){
-				formatted= minute + "m " + formatted;
-				if(hour > 0 || date > 0 || month > 0 || year > 0){
-					formatted = hour + "h " + formatted;
-					if (date > 0 || month > 0 || year > 0){
-						formatted = date + "d " + formatted;
-						if (month > 0 || year > 0){
-							formatted = month + "m " + formatted;
-							if (year > 0){
-								formatted = year + "y " + formatted;
-							}
-						}
-					}
-				}
-			}
 
-	    	return formatted;
-	 }*/
 	public String elapsedTime(int before, int after){
 		Period period = new Period(before * 1000L, after * 1000L);
 		
 		String formatted= period.getSeconds() + "s";
 		
-		if (period.getMinutes() > 0 || period.getHours() > 0 || period.getDays() > 0 || period.getMonths() > 0 || period.getYears() > 0){
+		if (period.getMinutes() > 0 || period.getHours() > 0 || (period.getDays() + period.getWeeks() * 7) > 0 || period.getMonths() > 0 || period.getYears() > 0){
 			formatted= period.getMinutes() + "m " + formatted;
-			if(period.getHours() > 0 || period.getDays() > 0 || period.getMonths() > 0 || period.getYears() > 0){
+			if(period.getHours() > 0 || period.getDays() + period.getWeeks() * 7 > 0 || period.getMonths() > 0 || period.getYears() > 0){
 				formatted = period.getHours() + "h " + formatted;
-				if (period.getDays() > 0 || period.getMonths() > 0 || period.getYears() > 0){
-					formatted = period.getDays() + "d " + formatted;
+				if ((period.getDays() + period.getWeeks() * 7) > 0 || period.getMonths() > 0 || period.getYears() > 0){
+					formatted = (period.getDays() + (period.getWeeks() * 7)) + "d " + formatted;
 					if (period.getMonths() > 0 || period.getYears() > 0){
 						formatted = period.getMonths() + "m " + formatted;
 						if (period.getYears() > 0){

@@ -1,9 +1,9 @@
 package com.md_5.autogroup;
 
-import java.util.Calendar;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+
+import com.joda.time.DateTime;
 
 public class Ticker implements Runnable {
 
@@ -17,12 +17,9 @@ public class Ticker implements Runnable {
             if (Config.promotionType.equalsIgnoreCase("seconds")){
             	AutoGroup.playerTimes.get(name).setTime(AutoGroup.playerTimes.get(name).getTime() + Config.interval);
             } else if (Config.promotionType.equalsIgnoreCase("days")){
-            	Calendar now=Calendar.getInstance();
-            	now.setTimeInMillis(System.currentTimeMillis());
-            	Calendar cal=Calendar.getInstance();
-            	cal.setTimeInMillis(AutoGroup.playerTimes.get(name).getLast() * 1000L);
-            	if (cal.get(Calendar.DAY_OF_YEAR) != now.get(Calendar.DAY_OF_YEAR) ||
-            			cal.get(Calendar.YEAR) != now.get(Calendar.YEAR)){
+            	DateTime now= new DateTime(System.currentTimeMillis());
+            	DateTime cal=new DateTime(AutoGroup.playerTimes.get(name).getLast() * 1000L);
+            	if (cal.dayOfYear() != now.dayOfYear() || cal.year() != now.year()){
             		AutoGroup.playerTimes.get(name).setTime(AutoGroup.playerTimes.get(name).getTime() + 1);
             	}
             }
