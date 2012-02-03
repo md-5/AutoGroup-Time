@@ -1,11 +1,11 @@
-package com.md_5.autogroup;
+package com.md_5.autogroup.time;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 public class Promote {
-	
+
 
     public static void checkPromote(String player) {
         int groupTime=0;
@@ -14,7 +14,7 @@ public class Promote {
         if (AutoGroup.groupTimes.size() == 1){
         	groupName = AutoGroup.groupNames.get(0);
         	groupTime = AutoGroup.groupTimes.get(0);
-        }else {                    	
+        }else {
         	for (int i=0; i < AutoGroup.groupTimes.size(); i++){
         		if (AutoGroup.groupTimes.get(i) <= AutoGroup.playerTimes.get(player).getTime()){
         			groupName = AutoGroup.groupNames.get(i);
@@ -24,7 +24,7 @@ public class Promote {
         }
         if (groupTime!=0 && groupName != "" && groupName != AutoGroup.playerTimes.get(player).getStatus())
         	promotePlayer(player, groupName);
-        
+
         Database.update(player);
         return;
 

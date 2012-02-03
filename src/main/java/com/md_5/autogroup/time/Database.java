@@ -1,4 +1,4 @@
-package com.md_5.autogroup;
+package com.md_5.autogroup.time;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
