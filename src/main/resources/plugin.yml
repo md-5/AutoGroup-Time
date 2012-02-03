@@ -1,5 +1,5 @@
 name: AutoGroup
-version: 1.2.0
+version: 1.2.2
 description: Bukkit plugin to automatically group users based on the time they have spent online and donation amounts.
 author: md_5
 website: https://github.com/md-5/AutoGroup
