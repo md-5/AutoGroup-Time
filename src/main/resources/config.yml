@@ -1,14 +1,13 @@
 debug: true
 
-# MYQL Database Information
+# MYSQL Database Information
+# Use either mysql or sqlite for connectionType
+connectionType: sqlite
 mysqlURL: 127.0.0.1
 dbName: AutoGroup
 username: AutoGroup
 password: AutoGroup
 
-# Internal Table Structure - Do not change!
-table: donators
-table2: players
 
 # Promotion command.
 # %1$s == glayername
@@ -18,21 +17,10 @@ command: permissions player setgroup %1$s %2$s
 # The interval between checking players times
 interval: 60
 
-# Loyalty Information
-loyaltyGroup: Whitelist
-loyaltyTime: 2678400
+# Valid values are seconds and days.
+# Days keeps track of the number of days you visited the server.
+# So after having visited the server on x different days you get promoted.
+promotionType: seconds
 
-# Donation Information
-don1Group: Don1
-don2Group: Don2
-don3Group: Don3
-don1Amount: 15
-don2Amount: 25
-don3Amount: 26
-
-addict1Group: Addict1
-addict2Group: Addict2
-addict3Group: Addict3
-addict1Amount: 3600
-addict2Amount: 36000
-addict3Amount: 360000
+groups:
+    Addict1: 0

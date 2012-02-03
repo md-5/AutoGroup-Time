@@ -1,9 +1,10 @@
 package com.md_5.autogroup;
 
-import com.md_5.autogroup.events.PlayerListener;
-import com.md_5.autogroup.events.WorldListener;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.logging.Logger;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -13,11 +14,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class AutoGroup extends JavaPlugin {
+import com.joda.time.DateTime;
+import com.joda.time.Period;
+import com.joda.time.format.DateTimeFormat;
+import com.joda.time.format.DateTimeFormatter;
+import com.md_5.autogroup.events.PlayerListener;
+import com.md_5.autogroup.events.WorldListener;
 
-    public static final Logger logger = Bukkit.getServer().getLogger();
+public class AutoGroup extends JavaPlugin{
+	
+	public static final Logger logger = Bukkit.getServer().getLogger();
     public static HashMap<String, Map> playerTimes = new HashMap<String, Map>();
-    public static HashMap<String, Don> playerDonations = new HashMap<String, Don>();
+    public static ArrayList<String> groupNames = new ArrayList<String>(3);
+    public static ArrayList<Integer> groupTimes = new ArrayList<Integer>(3);
     static FileConfiguration config;
 
     public void onEnable() {
@@ -31,37 +40,37 @@ public class AutoGroup extends JavaPlugin {
         playerListener.registerEvents(pm);
 
         config = getConfig();
-        config.options().copyDefaults(true);
+        if (!config.contains("groups"))
+        	config.options().copyDefaults(true);
+        else
+        	config.options().copyDefaults(false);
         saveConfig();
         Config.debug = config.getBoolean("debug", Config.debug);
         Config.interval = config.getInt("interval", Config.interval);
-        Config.loyalty = config.getInt("loyaltyTime", Config.loyalty);
-        Config.loyalGroup = config.getString("loyaltyGroup", Config.loyalGroup);
+        Config.connectionType = config.getString("connectionType", Config.connectionType);
         Config.url = config.getString("mysqlURL", Config.url);
         Config.dbName = config.getString("dbName", Config.dbName);
         Config.userName = config.getString("username", Config.userName);
         Config.password = config.getString("password", Config.password);
-        Config.table = config.getString("table", Config.table);
-        Config.table2 = config.getString("table2", Config.table2);
-        Config.don1Group = config.getString("don1Group", Config.don1Group);
-        Config.don2Group = config.getString("don2Group", Config.don2Group);
-        Config.don3Group = config.getString("don3Group", Config.don3Group);
-        Config.don1Amount = config.getInt("don1Amount", Config.don1Amount);
-        Config.don2Amount = config.getInt("don2Amount", Config.don2Amount);
-        Config.don3Amount = config.getInt("don3Amount", Config.don3Amount);
         Config.command = config.getString("command", Config.command);
-        Config.addictGroup1 = config.getString("addict1Group", Config.addictGroup1);
-        Config.addictGroup2 = config.getString("addict2Group", Config.addictGroup2);
-        Config.addictGroup3 = config.getString("addict3Group", Config.addictGroup3);
-        Config.addict1Time = config.getInt("addict1Amount", Config.addict1Time);
-        Config.addict2Time = config.getInt("addict2Amount", Config.addict2Time);
-        Config.addict3Time = config.getInt("addict3Amount", Config.addict3Time);
+        Config.promotionType = config.getString("promotionType", Config.promotionType);
 
+        for (String s : config.getConfigurationSection("groups").getKeys(false)){
+        		groupTimes.add(config.getInt("groups." + s));
+        		groupNames.add(s);
+        	}
+        Collections.sort(groupTimes);
+        for (String s : config.getConfigurationSection("groups").getKeys(false)){
+    		groupNames.set(groupTimes.indexOf(config.getInt("groups." + s)), s);
+    	}
+        
         Database.init();
 
-        if (Config.loyalty != 0 || Config.addict1Time != 0 || Config.addict2Time != 0 || Config.addict3Time != 0) {
+        if (!groupTimes.contains(0)) {
             getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Ticker(), Config.interval * 20, Config.interval * 20);
         }
+        else 
+        	logger.info("AutoGroup: A group with no time has been detected. No promotions shall be made.");
         logger.info(String.format("AutoGroup v%1$s by md_5 enabled", this.getDescription().getVersion()));
     }
 
@@ -84,93 +93,159 @@ public class AutoGroup extends JavaPlugin {
     }
 
     public boolean onPlayerCommand(Player player, Command command, String label, String[] args) {
-        if (label.equalsIgnoreCase("playtime")) {
+        if (label.equalsIgnoreCase("playtime") && !groupTimes.isEmpty()) {
+        	int groupTime=0;
+            String groupName = "";
             switch (args.length) {
                 case 0:
                     if (!playerTimes.containsKey(player.getName())) {
                         player.sendMessage("That player does not exist!");
                         return true;
                     }
-                    player.sendMessage(ChatColor.GOLD + "You joined the server "
-                            + (playerTimes.get(player.getName()).getLast() - playerTimes.get(player.getName()).getDate()) + " seconds ago");
-                    player.sendMessage(ChatColor.GOLD + "You must reach " + Config.loyalty + " seconds before you are loyal");
-                    player.sendMessage(ChatColor.GOLD + "You have played for "
-                            + playerTimes.get(player.getName()).getTime() + " seconds in total");
+                    player.sendMessage(ChatColor.GOLD + "You joined the server on " + ChatColor.DARK_GREEN
+                    		+ formattedDate(playerTimes.get(player.getName()).getDate()) + ChatColor.GOLD);
+                    player.sendMessage(ChatColor.GOLD + "which was " + ChatColor.DARK_GREEN
+                            + elapsedTime(playerTimes.get(player.getName()).getDate() , ((int) (System.currentTimeMillis() / 1000L)))
+                            + ChatColor.GOLD + " ago");
+                    
+                    if (groupTimes.size() == 1){
+                    	groupName = groupNames.get(0);
+                    	groupTime = groupTimes.get(0);
+                    }else {                    	
+                    	for (int i=groupTimes.size() - 1; i > -1 ; i--){
+                    		if (groupTimes.get(i) >= playerTimes.get(player.getName()).getTime()){
+                    			groupName = groupNames.get(i);
+                            	groupTime = groupTimes.get(i);
+                    		}
+                    	}
+                    }
+
+
+                    if (Config.promotionType.equalsIgnoreCase("seconds")){
+                    	if (groupName == ""){
+                    		player.sendMessage(ChatColor.GOLD  + "You have already achieved the highest rank.");
+                    	}else
+                    		player.sendMessage(ChatColor.DARK_GREEN + elapsedTime(playerTimes.get(player.getName()).getTime() , groupTime) 
+                    				+ ChatColor.GOLD + " before you reach the rank of " + ChatColor.RED + groupName);
+                    	player.sendMessage(ChatColor.GOLD + "You have played for " + ChatColor.DARK_GREEN
+                    			+ elapsedTime(0 , playerTimes.get(player.getName()).getTime()) + ChatColor.GOLD + " in total");
+                    }else if(Config.promotionType.equalsIgnoreCase("days")){
+                    	player.sendMessage(ChatColor.DARK_GREEN + "" + (groupTime - playerTimes.get(player.getName()).getTime())
+                    			+ ChatColor.GOLD + " day(s) before you reach the rank of " + ChatColor.RED + groupName);
+                    	player.sendMessage(ChatColor.GOLD + "You have logged into this server " + ChatColor.DARK_GREEN
+                    			+ playerTimes.get(player.getName()).getTime() + ChatColor.GOLD + " day(s)");
+                    }
                     break;
+                    
                 case 1:
                     if (player.hasPermission("autogroup.playtime.others")) {
                         if (!playerTimes.containsKey(args[0])) {
                             player.sendMessage("That player does not exist!");
                             return true;
                         }
-                        player.sendMessage(ChatColor.GOLD + args[0] + " joined the server "
-                                + (playerTimes.get(args[0]).getLast() - playerTimes.get(args[0]).getDate()) + " seconds ago");
-                        player.sendMessage(ChatColor.GOLD + args[0] + " must reach " + Config.loyalty + " seconds before they are loyal");
-                        player.sendMessage(ChatColor.GOLD + args[0] + " has played for "
-                                + playerTimes.get(args[0]).getTime() + " seconds in total");
-                    } else {
-                        player.sendMessage("You can only view your own time. Run this command without arguments");
+                        player.sendMessage(ChatColor.RED + args[0] + ChatColor.GOLD + " joined the server on "+ ChatColor.DARK_GREEN
+                        		+ formattedDate(playerTimes.get(args[0]).getDate()) + ChatColor.GOLD); 
+                        		player.sendMessage(ChatColor.GOLD + "which was " + ChatColor.DARK_GREEN
+                                + elapsedTime(playerTimes.get(args[0]).getDate() , ((int) (System.currentTimeMillis() / 1000L))) 
+                                + ChatColor.GOLD + " ago");
+                     
+                        if (groupTimes.size() == 1){
+                        	groupName = groupNames.get(0);
+                        	groupTime = groupTimes.get(0);
+                        }else {                    	
+                        	for (int i=groupTimes.size() - 1; i > -1 ; i--){
+                        		if (groupTimes.get(i) >= playerTimes.get(args[0]).getTime()){
+                        			groupName = groupNames.get(i);
+                                	groupTime = groupTimes.get(i);
+                        		}
+                        	}
+                        }
+                        
+                        if (Config.promotionType.equalsIgnoreCase("seconds")){
+                        	if (groupName == ""){
+                        		player.sendMessage(ChatColor.GOLD + args[0] + " has already achieved the highest rank.");
+                        	}else
+                        		player.sendMessage(ChatColor.RED + args[0] + ChatColor.GOLD + " must play "+ ChatColor.DARK_GREEN + elapsedTime(playerTimes.get(args[0]).getTime() , groupTime));
+                        		player.sendMessage(ChatColor.GOLD + "before they reach the rank of " + ChatColor.RED + groupName);
+                        		player.sendMessage(ChatColor.GOLD + args[0] + " has played for " + ChatColor.DARK_GREEN
+                        			+ elapsedTime(0 , playerTimes.get(player.getName()).getTime()) + ChatColor.GOLD + " in total");
+                        }
+                        else if(Config.promotionType.equalsIgnoreCase("days")){
+                        	if (groupName == ""){
+                        		player.sendMessage(ChatColor.GOLD + args[0] + " has already achieved the highest rank.");
+                        	}else
+                        		player.sendMessage(ChatColor.DARK_GREEN + "" + (groupTime - playerTimes.get(player.getName()).getTime())
+                        				+ ChatColor.GOLD + " day(s) before " + args[0] +  " reach the rank of " + ChatColor.RED + groupName);
+                        	player.sendMessage(ChatColor.GOLD + args[0] + " has logged into this server " + ChatColor.DARK_GREEN
+                        			+ playerTimes.get(player.getName()).getTime() + ChatColor.GOLD + " day(s)");
+                        }
+                    } else if (!player.hasPermission("autogroup.playtime.others")) {
+                        player.sendMessage("You have no permission to see other people's playtime.");
                     }
                     break;
+                    
+                case 2:
+                	if (player.hasPermission("autogroup.playtime.settime")) {
+                		if (!playerTimes.containsKey(args[0])) {
+                            player.sendMessage("That player does not exist, or is not online!");
+                            return true;
+                        }
+                		try {
+                			playerTimes.get(args[0]).setTime(Integer.parseInt(args[1]));
+                			player.sendMessage(ChatColor.RED + args[0] + ChatColor.GOLD +"'s time has been set to " + " " + elapsedTime(0,Integer.parseInt(args[1])));
+                		}
+                		catch (NumberFormatException e){
+                			player.sendMessage("That is not a valid number");
+                		}
+                	} else if (!player.hasPermission("autogroup.playtime.settime")) {
+                		player.sendMessage("You have no permission to set other people's playtime.");
+                	}
+                	break;
             }
             return true;
         }
-        MYSQL.init();
-        String name = player.getName();
-        if (args.length == 0) {
-            MYSQL.loadAmount(name);
-            player.sendMessage(ChatColor.GREEN + "Your donations total $" + playerDonations.get(name).amount);
-            playerDonations.remove(name);
-            return true;
-        }
-        MYSQL.load(args[0], name);
-        if (playerDonations.get(name).payment_amount == 0) {
-            player.sendMessage(ChatColor.RED + "Are you trying to scam us? Invalid transaction id!");
-            playerDonations.remove(name);
-            return true;
-        }
-        player.sendMessage(ChatColor.RED + "The following information has been found about your donation:");
-        player.sendMessage(ChatColor.GREEN + "First Name: " + playerDonations.get(name).first_name);
-        player.sendMessage(ChatColor.GREEN + "Last Name: " + playerDonations.get(name).last_name);
-        player.sendMessage(ChatColor.GREEN + "Email Address: " + playerDonations.get(name).payer_email);
-        player.sendMessage(ChatColor.GREEN + "Amount: " + playerDonations.get(name).payment_amount);
-        player.sendMessage(ChatColor.GREEN + "Claimed: " + playerDonations.get(name).claimed);
-        player.sendMessage(ChatColor.GREEN + "Total: " + (playerDonations.get(name).amount + playerDonations.get(name).payment_amount));
-        if (playerDonations.get(name).claimed) {
-            player.sendMessage(ChatColor.RED + "That donation has been processed and your total will remain at $" + playerDonations.get(name).amount);
-            playerDonations.remove(name);
-            return true;
-        }
-        boolean add = false;
-        if (playerDonations.get(name).name == null) {
-            add = true;
-        }
-        playerDonations.get(name).name = name;
-        playerDonations.get(name).amount += playerDonations.get(name).payment_amount;
-        playerDonations.get(name).claimed = true;
-        if (add) {
-            MYSQL.add(name);
-        }
-        MYSQL.update(name, args[0]);
-        if (playerDonations.get(name).amount <= Config.don1Amount) {
-            player.sendMessage("That donation is big enough for " + Config.don1Group + " status. You have now been promoted to that rank!");
-            Promote.promotePlayer(name, Config.don1Group);
-        } else if (playerDonations.get(name).amount <= Config.don2Amount) {
-            player.sendMessage("That donation is big enough for " + Config.don2Group + " status. You have now been promoted to that rank!");
-            Promote.promotePlayer(name, Config.don2Group);
-        } else if (playerDonations.get(name).amount >= Config.don3Amount) {
-            player.sendMessage("That donation is big enough for " + Config.don3Group + " status. You have now been promoted to that rank!");
-            Promote.promotePlayer(name, Config.don3Group);
-        } else {
-            player.sendMessage("That donation is not big enough to increase your rank :(");
-        }
-        playerDonations.remove(name);
         return true;
     }
+
+
 
     public boolean onConsoleCommand(CommandSender sender, Command command, String label, String[] args) {
         sender.sendMessage(String.format("AutoGroup v%1$s by md_5", this.getDescription().getVersion()));
         sender.sendMessage("AutoGroup: No other console functionality is available at this time");
         return true;
     }
+    
+
+	public String formattedDate(int seconds){
+		DateTime cal = new DateTime(seconds * 1000L);
+		DateTimeFormatter fmt = DateTimeFormat.forPattern("MMM dd, yyyy, hh:mm");
+		return cal.toString(fmt);
+	}
+
+	public String elapsedTime(int before, int after){
+		Period period = new Period(before * 1000L, after * 1000L);
+		
+		String formatted= period.getSeconds() + "s";
+		
+		if (period.getMinutes() > 0 || period.getHours() > 0 || (period.getDays() + period.getWeeks() * 7) > 0 || period.getMonths() > 0 || period.getYears() > 0){
+			formatted= period.getMinutes() + "m " + formatted;
+			if(period.getHours() > 0 || period.getDays() + period.getWeeks() * 7 > 0 || period.getMonths() > 0 || period.getYears() > 0){
+				formatted = period.getHours() + "h " + formatted;
+				if ((period.getDays() + period.getWeeks() * 7) > 0 || period.getMonths() > 0 || period.getYears() > 0){
+					formatted = (period.getDays() + (period.getWeeks() * 7)) + "d " + formatted;
+					if (period.getMonths() > 0 || period.getYears() > 0){
+						formatted = period.getMonths() + "m " + formatted;
+						if (period.getYears() > 0){
+							formatted = period.getYears() + "y " + formatted;
+						}
+					}
+				}
+			}
+		}
+		
+		return formatted;
+
+	}
+	
+
 }

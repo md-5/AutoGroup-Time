@@ -1,13 +1,14 @@
 package com.md_5.autogroup.events;
 
-import com.md_5.autogroup.AutoGroup;
-import com.md_5.autogroup.Database;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event.Type;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.plugin.PluginManager;
 
-public class WorldListener extends org.bukkit.event.world.WorldListener {
+import com.md_5.autogroup.AutoGroup;
+import com.md_5.autogroup.Database;
+
+public class WorldListener implements Listener {
 
     private final AutoGroup plugin;
 
@@ -16,10 +17,10 @@ public class WorldListener extends org.bukkit.event.world.WorldListener {
     }
 
     public void registerEvents(final PluginManager pm) {
-        pm.registerEvent(Type.WORLD_SAVE, this, Priority.Normal, plugin);
+        pm.registerEvents(this, plugin);
     }
 
-    @Override
+    @EventHandler
     public void onWorldSave(WorldSaveEvent event) {
         Database.save();
     }

@@ -1,14 +1,15 @@
 package com.md_5.autogroup.events;
 
-import com.md_5.autogroup.AutoGroup;
-import com.md_5.autogroup.Database;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event.Type;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.PluginManager;
 
-public class PlayerListener extends org.bukkit.event.player.PlayerListener {
+import com.md_5.autogroup.AutoGroup;
+import com.md_5.autogroup.Database;
+
+public class PlayerListener implements Listener {
 
     private final AutoGroup plugin;
 
@@ -17,11 +18,10 @@ public class PlayerListener extends org.bukkit.event.player.PlayerListener {
     }
 
     public void registerEvents(final PluginManager pm) {
-        pm.registerEvent(Type.PLAYER_QUIT, this, Priority.Normal, plugin);
-        pm.registerEvent(Type.PLAYER_JOIN, this, Priority.Normal, plugin);
+        pm.registerEvents(this, plugin);
     }
 
-    @Override
+    @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         String name = event.getPlayer().getName();
         if (AutoGroup.playerTimes.containsKey(name)) {
@@ -31,7 +31,7 @@ public class PlayerListener extends org.bukkit.event.player.PlayerListener {
         }
     }
 
-    @Override
+    @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Database.load(event.getPlayer().getName());
     }
