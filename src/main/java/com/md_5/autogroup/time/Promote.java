@@ -21,13 +21,11 @@ public class Promote {
                 }
             }
         }
-        if (groupTime != 0 && groupName != "" && groupName != AutoGroup.playerTimes.get(player).getStatus()) {
+        if (groupTime != 0 && !groupName.isEmpty() && !groupName.equals(AutoGroup.playerTimes.get(player).getStatus())) {
             promotePlayer(player, groupName);
         }
 
         AutoGroup.database.update(player);
-        return;
-
     }
 
     public static void promotePlayer(String player, String group) {
@@ -40,8 +38,5 @@ public class Promote {
         }
         AutoGroup.playerTimes.get(player).setStatus(group);
         Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), String.format(Config.command, player, group));
-        return;
     }
 }
-//AutoGroup.logger.info(String.format("Player %1$s has been playing for %2$d seconds", player, AutoGroup.playerTimes.get(player).time));
-//AutoGroup.logger.info(String.format("Player %1$s has been loyal", player));

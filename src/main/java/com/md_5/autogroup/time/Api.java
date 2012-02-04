@@ -16,6 +16,10 @@ public class Api implements Database {
         }
     }
 
+    public String getConnectionString() {
+        return engine.getConnectionString();
+    }
+
     public void init() {
         try {
             engine.init();

@@ -2,7 +2,7 @@ package com.md_5.autogroup.time.backends;
 
 public interface Database {
 
-    String connectionString = "";
+    public String getConnectionString();
 
     public void init() throws Exception;
 

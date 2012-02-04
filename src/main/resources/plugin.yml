@@ -2,15 +2,15 @@ name: AutoGroup
 version: 1.2.2
 description: Bukkit plugin to automatically group users based on the time they have spent online and donation amounts.
 author: md_5
-website: https://github.com/md-5/AutoGroup
+website: https://github.com/md-5/AutoGroup-Time
 
-main: com.md_5.autogroup.AutoGroup
+main: com.md_5.autogroup.time.AutoGroup
 
 commands:
   playtime:
-    description: View how long a player has been playing for and time until next rank
+    description: View how long a player has been playing for, time until next rank, and if allowed, ability to change that time
     aliases: play
-    permission: autogroup.playtime 
+    permission: autogroup.playtime
 
 permissions:
     autogroup.playtime:
@@ -20,7 +20,7 @@ permissions:
         description: Allows use of the playtime command on others
         default: op
     autogroup.playtime.settime:
-        description: Allows use of the playtime command on others
+        description: Allows setting how long a player has played for
         default: op
     autogroup.norank:
         description: Prevents player from being ranked

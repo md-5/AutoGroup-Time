@@ -12,12 +12,16 @@ import org.bukkit.entity.Player;
 
 public class MySQL implements Database {
 
+    private String connectionString;
+
     public MySQL() {
-        connectionString =  connectionString = "jdbc:mysql://" + Config.url + ":" + 3306 + "/" + Config.dbName
-            + "?user=" + Config.userName + "&password=" + Config.password;;
+        connectionString = connectionString = "jdbc:mysql://" + Config.url + ":" + 3306 + "/" + Config.dbName
+                + "?user=" + Config.userName + "&password=" + Config.password;;
     }
 
-
+    public String getConnectionString() {
+        return connectionString;
+    }
 
     public void init() throws Exception {
         Connection conn = DriverManager.getConnection(connectionString);

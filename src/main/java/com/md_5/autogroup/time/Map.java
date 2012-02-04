@@ -2,10 +2,10 @@ package com.md_5.autogroup.time;
 
 public class Map {
 
-    private int time; //time in seconds they have been on server
-    private int date; //first time they joined
-    private int last; //last time they were on
-    private String status = "";//what group do they have (used to determine promotion eligibility
+    private int time; // time in seconds they have been on server
+    private int date; // first time they joined
+    private int last; // last time they were on
+    private String status = ""; // what group do they have (used to determine promotion eligibility
 
     public Map(int time, int date, int last) {
         this.time = time;
@@ -37,7 +37,7 @@ public class Map {
         this.last = (int) last;
     }
 
-  public String getStatus() {
+    public String getStatus() {
         return status;
     }
 
