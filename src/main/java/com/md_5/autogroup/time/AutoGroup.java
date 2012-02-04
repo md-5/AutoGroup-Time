@@ -23,7 +23,9 @@ import org.bukkit.event.world.WorldSaveEvent;
 
 public class AutoGroup extends JavaPlugin implements Listener {
 
+    public static AutoGroup instance;
     public static Logger logger;
+    public static Api database;
     public static HashMap<String, Map> playerTimes = new HashMap<String, Map>();
     public static ArrayList<String> groupNames = new ArrayList<String>(3);
     public static ArrayList<Integer> groupTimes = new ArrayList<Integer>(3);
@@ -31,6 +33,7 @@ public class AutoGroup extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
+        instance = this;
         logger = getLogger();
         getServer().getPluginManager().registerEvents(this, this);
         config = getConfig();
@@ -59,7 +62,8 @@ public class AutoGroup extends JavaPlugin implements Listener {
             groupNames.set(groupTimes.indexOf(config.getInt("groups." + s)), s);
         }
 
-        Database.init();
+        new Api();
+        database.init();
 
         if (!groupTimes.contains(0)) {
             getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Ticker(), Config.interval * 20, Config.interval * 20);
@@ -70,7 +74,7 @@ public class AutoGroup extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        Database.save();
+        database.save();
         getServer().getScheduler().cancelTasks(this);
     }
 
@@ -224,7 +228,7 @@ public class AutoGroup extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onWorldSave(WorldSaveEvent event) {
-        Database.save();
+        database.save();
     }
 
     @EventHandler
@@ -232,13 +236,13 @@ public class AutoGroup extends JavaPlugin implements Listener {
         String name = event.getPlayer().getName();
         if (AutoGroup.playerTimes.containsKey(name)) {
             AutoGroup.playerTimes.get(name).setLast((int) (System.currentTimeMillis() / 1000L));
-            Database.update(name);
+            database.update(name);
             AutoGroup.playerTimes.remove(name);
         }
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        Database.load(event.getPlayer().getName());
+        database.load(event.getPlayer().getName());
     }
 }

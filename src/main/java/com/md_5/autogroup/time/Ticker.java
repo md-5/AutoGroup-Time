@@ -12,7 +12,7 @@ public class Ticker implements Runnable {
             String name = player.getName();
             if (!AutoGroup.playerTimes.containsKey(name)) {
                 AutoGroup.playerTimes.put(name, new Map(0, (int) (System.currentTimeMillis() / 1000L), 0));
-                Database.add(name);
+                AutoGroup.database.add(name);
             }
             if (Config.promotionType.equalsIgnoreCase("seconds")) {
                 AutoGroup.playerTimes.get(name).setTime(AutoGroup.playerTimes.get(name).getTime() + Config.interval);

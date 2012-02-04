@@ -6,26 +6,26 @@ import org.bukkit.entity.Player;
 
 public class Promote {
 
-
     public static void checkPromote(String player) {
-        int groupTime=0;
+        int groupTime = 0;
         String groupName = "";
 
-        if (AutoGroup.groupTimes.size() == 1){
-        	groupName = AutoGroup.groupNames.get(0);
-        	groupTime = AutoGroup.groupTimes.get(0);
-        }else {
-        	for (int i=0; i < AutoGroup.groupTimes.size(); i++){
-        		if (AutoGroup.groupTimes.get(i) <= AutoGroup.playerTimes.get(player).getTime()){
-        			groupName = AutoGroup.groupNames.get(i);
-                	groupTime = AutoGroup.groupTimes.get(i);
-        		}
-        	}
+        if (AutoGroup.groupTimes.size() == 1) {
+            groupName = AutoGroup.groupNames.get(0);
+            groupTime = AutoGroup.groupTimes.get(0);
+        } else {
+            for (int i = 0; i < AutoGroup.groupTimes.size(); i++) {
+                if (AutoGroup.groupTimes.get(i) <= AutoGroup.playerTimes.get(player).getTime()) {
+                    groupName = AutoGroup.groupNames.get(i);
+                    groupTime = AutoGroup.groupTimes.get(i);
+                }
+            }
         }
-        if (groupTime!=0 && groupName != "" && groupName != AutoGroup.playerTimes.get(player).getStatus())
-        	promotePlayer(player, groupName);
+        if (groupTime != 0 && groupName != "" && groupName != AutoGroup.playerTimes.get(player).getStatus()) {
+            promotePlayer(player, groupName);
+        }
 
-        Database.update(player);
+        AutoGroup.database.update(player);
         return;
 
     }
