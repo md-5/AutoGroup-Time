@@ -1,23 +1,24 @@
 package com.md_5.autogroup.time;
 
-import com.md_5.autogroup.time.backends.Database;
-import com.md_5.autogroup.time.backends.MySQL;
-import com.md_5.autogroup.time.backends.SQLite;
+public class Api {
 
-public class Api implements Database {
-
-    private Database engine;
+    private final Database engine;
+    private final String connectionString;
+    private final String driver;
+    private final String createStatement;
 
     public Api() {
         if (Config.connectionType.equalsIgnoreCase("mysql")) {
-            engine = new MySQL();
+            connectionString = "jdbc:mysql://" + Config.url + ":" + 3306 + "/" + Config.dbName + "?user=" + Config.userName + "&password=" + Config.password;
+            driver = "org.mysql";
+            createStatement = "";
         } else {
-            engine = new SQLite();
+            connectionString = "create table if not exists AutoGroup (`name` text NOT NULL, `time` int(10) unsigned NOT NULL DEFAULT '0', `date` "
+                    + "int(10) unsigned NOT NULL DEFAULT '0', `last` int(10) unsigned NOT NULL DEFAULT '0', `status` text, PRIMARY KEY (`name`(20)))";
+            driver = "org.sqlite";
+            createStatement = "jdbc:sqlite:plugins/AutoGroup/users.db";
         }
-    }
-
-    public String getConnectionString() {
-        return engine.getConnectionString();
+        engine = new Database(connectionString, driver, createStatement);
     }
 
     public void init() {
@@ -28,15 +29,16 @@ public class Api implements Database {
         }
     }
 
-    public void load(String player) {
+    public Map load(final String player) {
         try {
-            engine.load(player);
+            return engine.load(player);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        return null;
     }
 
-    public void add(String player) {
+    public void add(final String player) {
         try {
             engine.add(player);
         } catch (Exception ex) {
@@ -44,17 +46,9 @@ public class Api implements Database {
         }
     }
 
-    public void update(String player) {
+    public void update(final String player, final int playTime, final String status) {
         try {
-            engine.update(player);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    public void save() {
-        try {
-            engine.save();
+            engine.update(player, playTime, status);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

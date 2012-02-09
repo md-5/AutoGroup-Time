@@ -1,8 +1,6 @@
 package com.md_5.autogroup.time;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.logging.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -10,7 +8,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -24,7 +21,6 @@ public class AutoGroup extends JavaPlugin implements Listener {
     public static AutoGroup instance;
     public static Logger logger;
     public static Api database;
-    public static HashMap<String, Map> playerTimes = new HashMap<String, Map>();
     public static ArrayList<String> groupNames = new ArrayList<String>(3);
     public static ArrayList<Integer> groupTimes = new ArrayList<Integer>(3);
     static FileConfiguration config;
@@ -35,31 +31,7 @@ public class AutoGroup extends JavaPlugin implements Listener {
         instance = this;
         logger = getLogger();
         getServer().getPluginManager().registerEvents(this, this);
-        config = getConfig();
-        if (!config.contains("groups")) {
-            config.options().copyDefaults(true);
-        } else {
-            config.options().copyDefaults(false);
-        }
-        saveConfig();
-        Config.debug = config.getBoolean("debug", Config.debug);
-        Config.interval = config.getInt("interval", Config.interval);
-        Config.connectionType = config.getString("connectionType", Config.connectionType);
-        Config.url = config.getString("mysqlURL", Config.url);
-        Config.dbName = config.getString("dbName", Config.dbName);
-        Config.userName = config.getString("username", Config.userName);
-        Config.password = config.getString("password", Config.password);
-        Config.command = config.getString("command", Config.command);
-        Config.promotionType = config.getString("promotionType", Config.promotionType);
-
-        for (String s : config.getConfigurationSection("groups").getKeys(false)) {
-            groupTimes.add(config.getInt("groups." + s));
-            groupNames.add(s);
-        }
-        Collections.sort(groupTimes);
-        for (String s : config.getConfigurationSection("groups").getKeys(false)) {
-            groupNames.set(groupTimes.indexOf(config.getInt("groups." + s)), s);
-        }
+        
 
         new Api();
         database.init();
@@ -226,22 +198,14 @@ public class AutoGroup extends JavaPlugin implements Listener {
     }
 
     @EventHandler
-    public void onWorldSave(WorldSaveEvent event) {
-        database.save();
+    public void onWorldSave(final WorldSaveEvent event) {
     }
 
     @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event) {
-        String name = event.getPlayer().getName();
-        if (AutoGroup.playerTimes.containsKey(name)) {
-            AutoGroup.playerTimes.get(name).setLast((int) (System.currentTimeMillis() / 1000L));
-            database.update(name);
-            AutoGroup.playerTimes.remove(name);
-        }
+    public void onPlayerQuit(final PlayerQuitEvent event) {
     }
 
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        database.load(event.getPlayer().getName());
+    public static int getTime() {
+        return (int) (System.currentTimeMillis() / 1000L);
     }
 }

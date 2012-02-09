@@ -2,39 +2,33 @@ package com.md_5.autogroup.time;
 
 public class Map {
 
-    private int time; // time in seconds they have been on server
-    private int date; // first time they joined
-    private int last; // last time they were on
-    private String status = ""; // what group do they have (used to determine promotion eligibility
+    private int playTime; // time in seconds they have been on server
+    private int firstJoin; // first time they joined
+    private int lastJoin; // last time they were on
+    private String status; // what group do they have (used to determine promotion eligibility
 
-    public Map(int time, int date, int last) {
-        this.time = time;
-        this.date = date;
-        this.last = last;
+    public int getPlayTime() {
+        return playTime;
     }
 
-    public int getTime() {
-        return time;
+    public void setPlayTime(int playTime) {
+        this.playTime = playTime;
     }
 
-    public void setTime(int time) {
-        this.time = time;
+    public int getFirstJoin() {
+        return firstJoin;
     }
 
-    public int getDate() {
-        return date;
+    public void setFirstJoin(int firstJoin) {
+        this.firstJoin = firstJoin;
     }
 
-    public void setDate(long date) {
-        this.date = (int) date;
+    public int getLastJoin() {
+        return lastJoin;
     }
 
-    public int getLast() {
-        return last;
-    }
-
-    public void setLast(long last) {
-        this.last = (int) last;
+    public void setLastJoin(int lastJoin) {
+        this.lastJoin = lastJoin;
     }
 
     public String getStatus() {
