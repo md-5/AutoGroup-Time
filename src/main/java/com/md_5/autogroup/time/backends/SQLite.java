@@ -18,7 +18,6 @@ public class SQLite implements Database {
     }
 
     public void init() throws Exception {
-        Bukkit.getServer().getPluginManager().getPlugin("AutoGroup").getDataFolder().mkdirs();
         Connection conn = DriverManager.getConnection(connectionString);
         Statement stat = conn.createStatement();
         stat.executeUpdate("create table if not exists AutoGroup (`name` text NOT NULL, `time` int(10) unsigned NOT NULL DEFAULT '0', `date` "

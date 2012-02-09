@@ -2,7 +2,6 @@ package com.md_5.autogroup.time;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-
 import org.joda.time.DateTime;
 
 public class Ticker implements Runnable {

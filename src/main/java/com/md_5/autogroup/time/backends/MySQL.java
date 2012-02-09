@@ -16,7 +16,7 @@ public class MySQL implements Database {
 
     public MySQL() {
         connectionString = connectionString = "jdbc:mysql://" + Config.url + ":" + 3306 + "/" + Config.dbName
-                + "?user=" + Config.userName + "&password=" + Config.password;;
+                + "?user=" + Config.userName + "&password=" + Config.password;
     }
 
     public String getConnectionString() {

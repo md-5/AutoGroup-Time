@@ -31,6 +31,7 @@ public class AutoGroup extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
+        getDataFolder().mkdirs();
         instance = this;
         logger = getLogger();
         getServer().getPluginManager().registerEvents(this, this);
