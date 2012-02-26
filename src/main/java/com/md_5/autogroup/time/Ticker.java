@@ -8,11 +8,7 @@ public class Ticker implements Runnable {
 
     public void run() {
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-            String name = player.getName();
-            if (!AutoGroup.playerTimes.containsKey(name)) {
-                AutoGroup.playerTimes.put(name, new Map(0, (int) (System.currentTimeMillis() / 1000L), 0));
-                AutoGroup.database.add(name);
-            }
+            PlayerData p = AutoGroup.database.load(player.getName());
             if (Config.promotionType.equalsIgnoreCase("seconds")) {
                 AutoGroup.playerTimes.get(name).setTime(AutoGroup.playerTimes.get(name).getTime() + Config.interval);
             } else if (Config.promotionType.equalsIgnoreCase("days")) {

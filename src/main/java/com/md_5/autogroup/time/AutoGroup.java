@@ -6,10 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
@@ -31,7 +28,7 @@ public class AutoGroup extends JavaPlugin implements Listener {
         instance = this;
         logger = getLogger();
         getServer().getPluginManager().registerEvents(this, this);
-        
+
 
         new Api();
         database.init();
@@ -45,7 +42,6 @@ public class AutoGroup extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        database.save();
         getServer().getScheduler().cancelTasks(this);
     }
 
@@ -195,14 +191,6 @@ public class AutoGroup extends JavaPlugin implements Listener {
 
         return formatted;
 
-    }
-
-    @EventHandler
-    public void onWorldSave(final WorldSaveEvent event) {
-    }
-
-    @EventHandler
-    public void onPlayerQuit(final PlayerQuitEvent event) {
     }
 
     public static int getTime() {

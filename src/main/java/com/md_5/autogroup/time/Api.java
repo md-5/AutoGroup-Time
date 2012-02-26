@@ -10,13 +10,13 @@ public class Api {
     public Api() {
         if (Config.connectionType.equalsIgnoreCase("mysql")) {
             connectionString = "jdbc:mysql://" + Config.url + ":" + 3306 + "/" + Config.dbName + "?user=" + Config.userName + "&password=" + Config.password;
-            driver = "org.mysql";
+            driver = "com.mysql.jdbc.Driver";
             createStatement = "";
         } else {
-            connectionString = "create table if not exists AutoGroup (`name` text NOT NULL, `time` int(10) unsigned NOT NULL DEFAULT '0', `date` "
+            connectionString = "jdbc:sqlite:plugins/AutoGroup/users.db";
+            driver = "org.sqlite.JDBC";
+            createStatement = "create table if not exists AutoGroup (`name` text NOT NULL, `time` int(10) unsigned NOT NULL DEFAULT '0', `date` "
                     + "int(10) unsigned NOT NULL DEFAULT '0', `last` int(10) unsigned NOT NULL DEFAULT '0', `status` text, PRIMARY KEY (`name`(20)))";
-            driver = "org.sqlite";
-            createStatement = "jdbc:sqlite:plugins/AutoGroup/users.db";
         }
         engine = new Database(connectionString, driver, createStatement);
     }
@@ -29,7 +29,7 @@ public class Api {
         }
     }
 
-    public Map load(final String player) {
+    public PlayerData load(String player) {
         try {
             return engine.load(player);
         } catch (Exception ex) {
@@ -38,17 +38,9 @@ public class Api {
         return null;
     }
 
-    public void add(final String player) {
+    public void update(PlayerData player) {
         try {
-            engine.add(player);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    public void update(final String player, final int playTime, final String status) {
-        try {
-            engine.update(player, playTime, status);
+            engine.update(player);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

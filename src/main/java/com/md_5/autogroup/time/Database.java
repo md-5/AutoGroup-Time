@@ -11,7 +11,7 @@ public class Database {
     private final String driver;
     private final String createStatement;
 
-    public Database(final String connectionString, final String driver, final String createStatement) {
+    public Database(String connectionString, String driver, String createStatement) {
         this.connectionString = connectionString;
         this.driver = driver;
         this.createStatement = createStatement;
@@ -26,17 +26,20 @@ public class Database {
         conn.close();
     }
 
-    public Map load(final String player) throws Exception {
+    public PlayerData load(String player) throws Exception {
         Connection conn = DriverManager.getConnection(connectionString);
         PreparedStatement stat = conn.prepareStatement("SELECT * FROM AutoGroup where name = ?");
         stat.setString(0, player);
         ResultSet rs = stat.executeQuery();
-        Map map = new Map();
-        while (rs.next()) {
+        PlayerData map = null;
+        if (rs.next()) {
+            map = new PlayerData(player);
             map.setPlayTime(rs.getInt("time"));
             map.setFirstJoin(rs.getInt("date"));
             map.setLastJoin(rs.getInt("last"));
             map.setStatus(rs.getString("status"));
+        } else {
+            map = add(player);
         }
         rs.close();
         stat.close();
@@ -44,8 +47,7 @@ public class Database {
         return map;
     }
 
-    public void add(final String player) throws Exception {
-        // TODO call from load
+    private PlayerData add(String player) throws Exception {
         Connection conn = DriverManager.getConnection(connectionString);
         PreparedStatement stat = conn.prepareStatement("INSERT INTO AutoGroup ('name', 'date') VALUES (?, ?)");
         stat.setString(0, player);
@@ -53,18 +55,18 @@ public class Database {
         stat.executeUpdate();
         stat.close();
         conn.close();
+        return load(player);
     }
 
-    public void update(final String player, final int playTime, final String status) throws Exception {
+    public void update(PlayerData player) throws Exception {
         Connection conn = DriverManager.getConnection(connectionString);
         PreparedStatement stat = conn.prepareStatement("UPDATE AutoGroup SET time = ? , last = ? , status = ? WHERE name = ?");
-        stat.setInt(0, playTime);
+        stat.setInt(0, player.getPlayTime());
         stat.setInt(1, AutoGroup.getTime());
-        stat.setString(2, status);
-        stat.setString(3, player);
+        stat.setString(2, player.getStatus());
+        stat.setString(3, player.name);
         stat.executeUpdate();
         stat.close();
         conn.close();
-        Cache.expire(player);
     }
 }
