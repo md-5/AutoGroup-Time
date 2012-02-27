@@ -34,34 +34,6 @@ public class AutoGroup extends JavaPlugin {
         getServer().getScheduler().cancelTasks(this);
     }
 
-    public String formattedDate(int seconds) {
-        DateTime cal = new DateTime(seconds * 1000L);
-        DateTimeFormatter fmt = DateTimeFormat.forPattern("MMM dd, yyyy, hh:mm");
-        return cal.toString(fmt);
-    }
-
-    public String elapsedTime(int before, int after) {
-        Period period = new Period(before * 1000L, after * 1000L);
-        String formatted = period.getSeconds() + "s";
-
-        if (period.getMinutes() > 0 || period.getHours() > 0 || (period.getDays() + period.getWeeks() * 7) > 0 || period.getMonths() > 0 || period.getYears() > 0) {
-            formatted = period.getMinutes() + "m " + formatted;
-            if (period.getHours() > 0 || period.getDays() + period.getWeeks() * 7 > 0 || period.getMonths() > 0 || period.getYears() > 0) {
-                formatted = period.getHours() + "h " + formatted;
-                if ((period.getDays() + period.getWeeks() * 7) > 0 || period.getMonths() > 0 || period.getYears() > 0) {
-                    formatted = (period.getDays() + (period.getWeeks() * 7)) + "d " + formatted;
-                    if (period.getMonths() > 0 || period.getYears() > 0) {
-                        formatted = period.getMonths() + "m " + formatted;
-                        if (period.getYears() > 0) {
-                            formatted = period.getYears() + "y " + formatted;
-                        }
-                    }
-                }
-            }
-        }
-        return formatted;
-    }
-
     public static int getTime() {
         return (int) (System.currentTimeMillis() / 1000L);
     }
