@@ -12,16 +12,10 @@ public class Database {
     private final String createStatement;
 
     public Database() {
-        if (Config.connectionType.equalsIgnoreCase("mysql")) {
-            this.connectionString = "jdbc:mysql://" + Config.url + ":" + 3306 + "/" + Config.dbName + "?user=" + Config.userName + "&password=" + Config.password;
-            this.driver = "com.mysql.jdbc.Driver";
-            this.createStatement = "";
-        } else {
-            this.connectionString = "jdbc:sqlite:plugins/AutoGroup/users.db";
-            this.driver = "org.sqlite.JDBC";
-            this.createStatement = "create table if not exists AutoGroup (`name` text NOT NULL, `time` int(10) unsigned NOT NULL DEFAULT '0', `date` "
-                    + "int(10) unsigned NOT NULL DEFAULT '0', `last` int(10) unsigned NOT NULL DEFAULT '0', `status` text, PRIMARY KEY (`name`(20)))";
-        }
+        this.connectionString = "jdbc:sqlite:plugins/AutoGroup/users.db";
+        this.driver = "org.sqlite.JDBC";
+        this.createStatement = "CREATE TABLE IF NOT EXISTS AutoGroup (`name` text NOT NULL, `time` int(10) unsigned NOT NULL DEFAULT '0', `date` "
+                + "int(10) unsigned NOT NULL DEFAULT '0', `last` int(10) unsigned NOT NULL DEFAULT '0', `status` text, PRIMARY KEY (`name`(20)))";
     }
 
     public void init() {
@@ -43,20 +37,20 @@ public class Database {
             PreparedStatement stat = conn.prepareStatement("SELECT * FROM AutoGroup where name = ?");
             stat.setString(0, player);
             ResultSet rs = stat.executeQuery();
-            PlayerData map = null;
+            PlayerData info = null;
             if (rs.next()) {
-                map = new PlayerData(player);
-                map.setPlayTime(rs.getInt("time"));
-                map.setFirstJoin(rs.getInt("date"));
-                map.setLastJoin(rs.getInt("last"));
-                map.setStatus(rs.getString("status"));
+                info = new PlayerData(player);
+                info.setPlayTime(rs.getInt("time"));
+                info.setFirstJoin(rs.getInt("date"));
+                info.setLastJoin(rs.getInt("last"));
+                info.setStatus(rs.getString("status"));
             } else {
-                map = add(player);
+                info = add(player);
             }
             rs.close();
             stat.close();
             conn.close();
-            return map;
+            return info;
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -80,20 +74,18 @@ public class Database {
     }
 
     public void update(PlayerData player) {
-        {
-            try {
-                Connection conn = DriverManager.getConnection(connectionString);
-                PreparedStatement stat = conn.prepareStatement("UPDATE AutoGroup SET time = ? , last = ? , status = ? WHERE name = ?");
-                stat.setInt(0, player.getPlayTime());
-                stat.setInt(1, AutoGroup.getTime());
-                stat.setString(2, player.getStatus());
-                stat.setString(3, player.getName());
-                stat.executeUpdate();
-                stat.close();
-                conn.close();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+        try {
+            Connection conn = DriverManager.getConnection(connectionString);
+            PreparedStatement stat = conn.prepareStatement("UPDATE AutoGroup SET time = ? , last = ? , status = ? WHERE name = ?");
+            stat.setInt(0, player.getPlayTime());
+            stat.setInt(1, AutoGroup.getTime());
+            stat.setString(2, player.getStatus());
+            stat.setString(3, player.getName());
+            stat.executeUpdate();
+            stat.close();
+            conn.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 }

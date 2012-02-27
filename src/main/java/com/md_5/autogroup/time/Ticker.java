@@ -2,7 +2,6 @@ package com.md_5.autogroup.time;
 
 import java.util.Map;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 public class Ticker implements Runnable {
@@ -24,7 +23,7 @@ public class Ticker implements Runnable {
                 }
             }
 
-            if (groupTime != 0 && !groupName.isEmpty() && !groupName.equals(p.getStatus()) && !Bukkit.getServer().getPlayer(p.name).hasPermission("autogroup.norank")) {
+            if (groupTime != 0 && !groupName.isEmpty() && !groupName.equals(p.getStatus()) && !Bukkit.getServer().getPlayer(p.getName()).hasPermission("autogroup.norank")) {
                 p.setStatus(groupName);
             }
             AutoGroup.database.update(p);
