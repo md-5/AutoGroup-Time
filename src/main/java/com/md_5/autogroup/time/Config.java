@@ -17,14 +17,8 @@ public class Config {
     public static String command = "permissions player setgroup %1$s %2$s";
     public static String promotionType = "seconds";
 
-    static {
-        FileConfiguration config = AutoGroup.instance.getConfig();
-        if (!config.contains("groups")) {
-            config.options().copyDefaults(true);
-        } else {
-            config.options().copyDefaults(false);
-        }
-        AutoGroup.instance.saveConfig();
+    public static void load(AutoGroup instance) {
+        FileConfiguration config = instance.getConfig();
         Config.debug = config.getBoolean("debug", Config.debug);
         Config.interval = config.getInt("interval", Config.interval);
         Config.connectionType = config.getString("connectionType", Config.connectionType);
@@ -36,12 +30,7 @@ public class Config {
         Config.promotionType = config.getString("promotionType", Config.promotionType);
 
         for (String s : config.getConfigurationSection("groups").getKeys(false)) {
-            AutoGroup.groupTimes.add(config.getInt("groups." + s));
-            AutoGroup.groupNames.add(s);
-        }
-        Collections.sort(AutoGroup.groupTimes);
-        for (String s : config.getConfigurationSection("groups").getKeys(false)) {
-            AutoGroup.groupNames.set(AutoGroup.groupTimes.indexOf(config.getInt("groups." + s)), s);
+            AutoGroup.groups.put(s, config.getInt("groups." + s));;
         }
     }
 }

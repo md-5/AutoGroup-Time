@@ -1,165 +1,37 @@
 package com.md_5.autogroup.time;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.util.HashMap;
 import java.util.logging.Logger;
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-public class AutoGroup extends JavaPlugin implements Listener {
+public class AutoGroup extends JavaPlugin {
 
-    public static AutoGroup instance;
     public static Logger logger;
-    public static Api database;
-    public static ArrayList<String> groupNames = new ArrayList<String>(3);
-    public static ArrayList<Integer> groupTimes = new ArrayList<Integer>(3);
+    public static Database database;
+    public static HashMap<String, Integer> groups = new HashMap<String, Integer>();
     static FileConfiguration config;
 
     @Override
     public void onEnable() {
-        getDataFolder().mkdirs();
-        instance = this;
         logger = getLogger();
-        getServer().getPluginManager().registerEvents(this, this);
-
-
-        new Api();
-        database.init();
-
-        if (!groupTimes.contains(0)) {
-            getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Ticker(), Config.interval * 20, Config.interval * 20);
-        } else {
-            logger.info("A group with no time has been detected. No promotions shall be made.");
+        if (!new File(getDataFolder(), "config.yml").exists()) {
+            saveDefaultConfig();
         }
+        Config.load(this);
+        database = new Database();
+        database.init();
+        getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Ticker(), Config.interval * 20, Config.interval * 20);
     }
 
     @Override
     public void onDisable() {
         getServer().getScheduler().cancelTasks(this);
-    }
-
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (label.equalsIgnoreCase("playtime") && !groupTimes.isEmpty()) {
-            int groupTime = 0;
-            String groupName = "";
-            switch (args.length) {
-                case 0:
-                    if (!playerTimes.containsKey(sender.getName())) {
-                        sender.sendMessage("That player does not exist!");
-                        return true;
-                    }
-                    sender.sendMessage(ChatColor.GOLD + "You joined the server on " + ChatColor.DARK_GREEN
-                            + formattedDate(playerTimes.get(sender.getName()).getDate()) + ChatColor.GOLD);
-                    sender.sendMessage(ChatColor.GOLD + "which was " + ChatColor.DARK_GREEN
-                            + elapsedTime(playerTimes.get(sender.getName()).getDate(), ((int) (System.currentTimeMillis() / 1000L)))
-                            + ChatColor.GOLD + " ago");
-
-                    if (groupTimes.size() == 1) {
-                        groupName = groupNames.get(0);
-                        groupTime = groupTimes.get(0);
-                    } else {
-                        for (int i = groupTimes.size() - 1; i > -1; i--) {
-                            if (groupTimes.get(i) >= playerTimes.get(sender.getName()).getTime()) {
-                                groupName = groupNames.get(i);
-                                groupTime = groupTimes.get(i);
-                            }
-                        }
-                    }
-
-
-                    if (Config.promotionType.equalsIgnoreCase("seconds")) {
-                        if (groupName.isEmpty()) {
-                            sender.sendMessage(ChatColor.GOLD + "You have already achieved the highest rank.");
-                        } else {
-                            sender.sendMessage(ChatColor.DARK_GREEN + elapsedTime(playerTimes.get(sender.getName()).getTime(), groupTime)
-                                    + ChatColor.GOLD + " before you reach the rank of " + ChatColor.RED + groupName);
-                        }
-                        sender.sendMessage(ChatColor.GOLD + "You have played for " + ChatColor.DARK_GREEN
-                                + elapsedTime(0, playerTimes.get(sender.getName()).getTime()) + ChatColor.GOLD + " in total");
-                    } else if (Config.promotionType.equalsIgnoreCase("days")) {
-                        sender.sendMessage(ChatColor.DARK_GREEN + "" + (groupTime - playerTimes.get(sender.getName()).getTime())
-                                + ChatColor.GOLD + " day(s) before you reach the rank of " + ChatColor.RED + groupName);
-                        sender.sendMessage(ChatColor.GOLD + "You have logged into this server " + ChatColor.DARK_GREEN
-                                + playerTimes.get(sender.getName()).getTime() + ChatColor.GOLD + " day(s)");
-                    }
-                    break;
-
-                case 1:
-                    if (sender.hasPermission("autogroup.playtime.others")) {
-                        if (!playerTimes.containsKey(args[0])) {
-                            sender.sendMessage("That player does not exist!");
-                            return true;
-                        }
-                        sender.sendMessage(ChatColor.RED + args[0] + ChatColor.GOLD + " joined the server on " + ChatColor.DARK_GREEN
-                                + formattedDate(playerTimes.get(args[0]).getDate()) + ChatColor.GOLD);
-                        sender.sendMessage(ChatColor.GOLD + "which was " + ChatColor.DARK_GREEN
-                                + elapsedTime(playerTimes.get(args[0]).getDate(), ((int) (System.currentTimeMillis() / 1000L)))
-                                + ChatColor.GOLD + " ago");
-
-                        if (groupTimes.size() == 1) {
-                            groupName = groupNames.get(0);
-                            groupTime = groupTimes.get(0);
-                        } else {
-                            for (int i = groupTimes.size() - 1; i > -1; i--) {
-                                if (groupTimes.get(i) >= playerTimes.get(args[0]).getTime()) {
-                                    groupName = groupNames.get(i);
-                                    groupTime = groupTimes.get(i);
-                                }
-                            }
-                        }
-
-                        if (Config.promotionType.equalsIgnoreCase("seconds")) {
-                            if (groupName.isEmpty()) {
-                                sender.sendMessage(ChatColor.GOLD + args[0] + " has already achieved the highest rank.");
-                            } else {
-                                sender.sendMessage(ChatColor.RED + args[0] + ChatColor.GOLD + " must play " + ChatColor.DARK_GREEN + elapsedTime(playerTimes.get(args[0]).getTime(), groupTime));
-                            }
-                            sender.sendMessage(ChatColor.GOLD + "before they reach the rank of " + ChatColor.RED + groupName);
-                            sender.sendMessage(ChatColor.GOLD + args[0] + " has played for " + ChatColor.DARK_GREEN
-                                    + elapsedTime(0, playerTimes.get(sender.getName()).getTime()) + ChatColor.GOLD + " in total");
-                        } else if (Config.promotionType.equalsIgnoreCase("days")) {
-                            if (groupName.isEmpty()) {
-                                sender.sendMessage(ChatColor.GOLD + args[0] + " has already achieved the highest rank.");
-                            } else {
-                                sender.sendMessage(ChatColor.DARK_GREEN + "" + (groupTime - playerTimes.get(sender.getName()).getTime())
-                                        + ChatColor.GOLD + " day(s) before " + args[0] + " reach the rank of " + ChatColor.RED + groupName);
-                            }
-                            sender.sendMessage(ChatColor.GOLD + args[0] + " has logged into this server " + ChatColor.DARK_GREEN
-                                    + playerTimes.get(sender.getName()).getTime() + ChatColor.GOLD + " day(s)");
-                        }
-                    } else if (!sender.hasPermission("autogroup.playtime.others")) {
-                        sender.sendMessage("You have no permission to see other people's playtime.");
-                    }
-                    break;
-
-                case 2:
-                    if (sender.hasPermission("autogroup.playtime.settime")) {
-                        if (!playerTimes.containsKey(args[0])) {
-                            sender.sendMessage("That player does not exist, or is not online!");
-                            return true;
-                        }
-                        try {
-                            playerTimes.get(args[0]).setTime(Integer.parseInt(args[1]));
-                            sender.sendMessage(ChatColor.RED + args[0] + ChatColor.GOLD + "'s time has been set to " + " " + elapsedTime(0, Integer.parseInt(args[1])));
-                        } catch (NumberFormatException ex) {
-                            sender.sendMessage("That is not a valid number");
-                        }
-                    } else if (!sender.hasPermission("autogroup.playtime.settime")) {
-                        sender.sendMessage("You have no permission to set other people's playtime.");
-                    }
-                    break;
-            }
-            return true;
-        }
-        return true;
     }
 
     public String formattedDate(int seconds) {
@@ -170,7 +42,6 @@ public class AutoGroup extends JavaPlugin implements Listener {
 
     public String elapsedTime(int before, int after) {
         Period period = new Period(before * 1000L, after * 1000L);
-
         String formatted = period.getSeconds() + "s";
 
         if (period.getMinutes() > 0 || period.getHours() > 0 || (period.getDays() + period.getWeeks() * 7) > 0 || period.getMonths() > 0 || period.getYears() > 0) {
@@ -188,9 +59,7 @@ public class AutoGroup extends JavaPlugin implements Listener {
                 }
             }
         }
-
         return formatted;
-
     }
 
     public static int getTime() {
