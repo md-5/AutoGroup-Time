@@ -1,14 +1,5 @@
 debug: true
 
-# MYSQL Database Information
-# Use either mysql or sqlite for connectionType
-connectionType: sqlite
-mysqlURL: 127.0.0.1
-dbName: AutoGroup
-username: AutoGroup
-password: AutoGroup
-
-
 # Promotion command.
 # %1$s == glayername
 # %2$s == group
@@ -17,10 +8,7 @@ command: permissions player setgroup %1$s %2$s
 # The interval between checking players times
 interval: 60
 
-# Valid values are seconds and days.
-# Days keeps track of the number of days you visited the server.
-# So after having visited the server on x different days you get promoted.
-promotionType: seconds
-
+# The defined auto promote groups
+# format is NAME: TIME
 groups:
     Addict1: 0
