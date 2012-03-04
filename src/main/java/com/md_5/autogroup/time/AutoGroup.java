@@ -3,19 +3,13 @@ package com.md_5.autogroup.time;
 import java.io.File;
 import java.util.HashMap;
 import java.util.logging.Logger;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.joda.time.DateTime;
-import org.joda.time.Period;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 public class AutoGroup extends JavaPlugin {
 
     public static Logger logger;
     public static Database database;
     public static HashMap<String, Integer> groups = new HashMap<String, Integer>();
-    static FileConfiguration config;
 
     @Override
     public void onEnable() {

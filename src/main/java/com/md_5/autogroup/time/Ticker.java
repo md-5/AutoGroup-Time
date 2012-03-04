@@ -16,14 +16,13 @@ public class Ticker implements Runnable {
             String groupName = new String();
 
             for (Map.Entry<String, Integer> group : AutoGroup.groups.entrySet()) {
-                if (group.getValue() <= p.getPlayTime()) {
+                if (group.getValue() <= p.getPlayTime() && group.getValue() > groupTime) {
                     groupName = group.getKey();
                     groupTime = group.getValue();
-                    break;
                 }
             }
 
-            if (groupTime != 0 && !groupName.isEmpty() && !groupName.equals(p.getStatus()) && !Bukkit.getServer().getPlayer(p.getName()).hasPermission("autogroup.norank")) {
+            if (groupTime != 0 && !groupName.equals(p.getStatus()) && !Bukkit.getServer().getPlayer(p.getName()).hasPermission("autogroup.norank")) {
                 p.setStatus(groupName);
             }
             AutoGroup.database.update(p);
