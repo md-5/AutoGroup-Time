@@ -8,7 +8,7 @@ public class PlayerData {
     private int playTime; // time in seconds they have been on server
     private int firstJoin; // first time they joined
     private int lastJoin; // last time they were on
-    private String status; // what group do they have (used to determine promotion eligibility
+    public String status; // what group do they have (used to determine promotion eligibility
     private String name; // This players name
 
     public PlayerData(String name) {
@@ -47,7 +47,7 @@ public class PlayerData {
         this.status = status;
         AutoGroup.logger.info(String.format("Trying to promote %1$s to group " + status, name));
         Bukkit.getServer().broadcastMessage(ChatColor.LIGHT_PURPLE + "AutoGroup: Please welcome " + name + " to group " + status);
-        Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), String.format(Config.command, name, status));
+        Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), String.format(AutoGroup.command, name, status));
     }
 
     public String getName() {

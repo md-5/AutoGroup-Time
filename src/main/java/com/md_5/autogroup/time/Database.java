@@ -23,7 +23,7 @@ public class Database {
                 + ")";
     }
 
-    public void init() {
+    public Database init() {
         try {
             Class.forName(driver);
             Connection conn = DriverManager.getConnection(connectionString);
@@ -34,13 +34,14 @@ public class Database {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        return this;
     }
 
     public PlayerData load(String player) {
         try {
             Connection conn = DriverManager.getConnection(connectionString);
             PreparedStatement stat = conn.prepareStatement("SELECT * FROM AutoGroup where name = ?");
-            stat.setString(0, player);
+            stat.setString(1, player);
             ResultSet rs = stat.executeQuery();
             PlayerData info = null;
             if (rs.next()) {
@@ -48,7 +49,7 @@ public class Database {
                 info.setPlayTime(rs.getInt("time"));
                 info.setFirstJoin(rs.getInt("date"));
                 info.setLastJoin(rs.getInt("last"));
-                info.setStatus(rs.getString("status"));
+                info.status = rs.getString("status");
             } else {
                 info = add(player);
             }
@@ -66,7 +67,7 @@ public class Database {
         try {
             Connection conn = DriverManager.getConnection(connectionString);
             PreparedStatement stat = conn.prepareStatement("INSERT INTO AutoGroup ('name') VALUES (?)");
-            stat.setString(0, player);
+            stat.setString(1, player);
             stat.executeUpdate();
             stat.close();
             conn.close();
@@ -81,7 +82,7 @@ public class Database {
         try {
             Connection conn = DriverManager.getConnection(connectionString);
             PreparedStatement stat = conn.prepareStatement("UPDATE AutoGroup SET time = ? , last = CURRENT_TIMESTAMP , status = ? WHERE name = ?");
-            stat.setInt(0, player.getPlayTime());
+            stat.setInt(1, player.getPlayTime());
             stat.setString(2, player.getStatus());
             stat.setString(3, player.getName());
             stat.executeUpdate();

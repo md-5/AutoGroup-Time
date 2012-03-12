@@ -1,5 +1,4 @@
-debug: true
-
+# AutoGroup config
 # Promotion command.
 # %1$s == glayername
 # %2$s == group
@@ -9,6 +8,7 @@ command: permissions player setgroup %1$s %2$s
 interval: 60
 
 # The defined auto promote groups
-# format is NAME: TIME
+# format is NAME: TIME (seconds)
 groups:
-    Addict1: 0
+    Addict1: 120
+    Addict2: 24000

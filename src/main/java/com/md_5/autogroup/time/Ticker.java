@@ -9,7 +9,7 @@ public class Ticker implements Runnable {
     public void run() {
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
             PlayerData p = AutoGroup.database.load(player.getName());
-            p.setPlayTime(p.getPlayTime() + Config.interval);
+            p.setPlayTime(p.getPlayTime() + AutoGroup.interval);
             p.setLastJoin(AutoGroup.getTime());
 
             int groupTime = 0;
@@ -22,7 +22,7 @@ public class Ticker implements Runnable {
                 }
             }
 
-            if (groupTime != 0 && !groupName.equals(p.getStatus()) && !Bukkit.getServer().getPlayer(p.getName()).hasPermission("autogroup.norank")) {
+            if (groupTime != 0 && !groupName.equals(p.getStatus()) && !player.hasPermission("autogroup.norank")) {
                 p.setStatus(groupName);
             }
             AutoGroup.database.update(p);

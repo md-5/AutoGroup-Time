@@ -3,6 +3,7 @@ package com.md_5.autogroup.time;
 import java.io.File;
 import java.util.HashMap;
 import java.util.logging.Logger;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class AutoGroup extends JavaPlugin {
@@ -10,6 +11,8 @@ public class AutoGroup extends JavaPlugin {
     public static Logger logger;
     public static Database database;
     public static HashMap<String, Integer> groups = new HashMap<String, Integer>();
+    public static int interval;
+    public static String command;
 
     @Override
     public void onEnable() {
@@ -17,10 +20,16 @@ public class AutoGroup extends JavaPlugin {
         if (!new File(getDataFolder(), "config.yml").exists()) {
             saveDefaultConfig();
         }
-        Config.load(this);
-        database = new Database();
-        database.init();
-        getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Ticker(), Config.interval * 20, Config.interval * 20);
+        FileConfiguration conf = getConfig();
+        conf.options().copyDefaults(true);
+        saveConfig();
+        interval = conf.getInt("interval");
+        command = conf.getString("command");
+        for (String s : conf.getConfigurationSection("groups").getKeys(false)) {
+            AutoGroup.groups.put(s, conf.getInt("groups." + s));
+        }
+        database = new Database().init();
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, new Ticker(), interval * 20, interval * 20);
     }
 
     @Override
