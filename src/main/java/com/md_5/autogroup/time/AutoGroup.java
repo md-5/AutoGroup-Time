@@ -21,8 +21,6 @@ public class AutoGroup extends JavaPlugin {
             saveDefaultConfig();
         }
         FileConfiguration conf = getConfig();
-        conf.options().copyDefaults(true);
-        saveConfig();
         interval = conf.getInt("interval");
         command = conf.getString("command");
         for (String s : conf.getConfigurationSection("groups").getKeys(false)) {
