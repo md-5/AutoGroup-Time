@@ -10,5 +10,5 @@ interval: 60
 # The defined auto promote groups
 # format is NAME: TIME (seconds)
 groups:
-    Addict1: 120
-    Addict2: 24000
+    Addict1: 0
+    Addict2: 0
