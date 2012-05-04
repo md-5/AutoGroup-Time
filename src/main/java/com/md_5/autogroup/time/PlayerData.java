@@ -1,56 +1,56 @@
 package com.md_5.autogroup.time;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 
-public class PlayerData {
+public class PlayerData
+{
+	private int playTime;
+	private int firstJoin;
+	private int lastJoin;
+	public String status;
+	private String name;
 
-    private int playTime; // time in seconds they have been on server
-    private int firstJoin; // first time they joined
-    private int lastJoin; // last time they were on
-    public String status; // what group do they have (used to determine promotion eligibility
-    private String name; // This players name
+	public PlayerData(String name)
+	{
+		this.name = name;
+	}
 
-    public PlayerData(String name) {
-        this.name = name;
-    }
+	public int getPlayTime() {
+		return this.playTime;
+	}
 
-    public int getPlayTime() {
-        return playTime;
-    }
+	public void setPlayTime(int playTime) {
+		this.playTime = playTime;
+	}
 
-    public void setPlayTime(int playTime) {
-        this.playTime = playTime;
-    }
+	public int getFirstJoin() {
+		return this.firstJoin;
+	}
 
-    public int getFirstJoin() {
-        return firstJoin;
-    }
+	public void setFirstJoin(int firstJoin) {
+		this.firstJoin = firstJoin;
+	}
 
-    public void setFirstJoin(int firstJoin) {
-        this.firstJoin = firstJoin;
-    }
+	public int getLastJoin() {
+		return this.lastJoin;
+	}
 
-    public int getLastJoin() {
-        return lastJoin;
-    }
+	public void setLastJoin(int lastJoin) {
+		this.lastJoin = lastJoin;
+	}
 
-    public void setLastJoin(int lastJoin) {
-        this.lastJoin = lastJoin;
-    }
+	public String getStatus() {
+		return this.status;
+	}
 
-    public String getStatus() {
-        return status;
-    }
+	public void setStatus(String status) {
+		this.status = status;
+		AutoGroup.logger.info(String.format("Trying to promote %1$s to group " + status, new Object[] { this.name }));
+		Bukkit.getServer().broadcastMessage(org.bukkit.ChatColor.GOLD + this.name + " has reached " + status + " status!");
+		Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), String.format(AutoGroup.command, new Object[] { this.name, status }));
+	}
 
-    public void setStatus(String status) {
-        this.status = status;
-        AutoGroup.logger.info(String.format("Trying to promote %1$s to group " + status, name));
-        Bukkit.getServer().broadcastMessage(ChatColor.LIGHT_PURPLE + "AutoGroup: Please welcome " + name + " to group " + status);
-        Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), String.format(AutoGroup.command, name, status));
-    }
-
-    public String getName() {
-        return name;
-    }
-}
+	public String getName() {
+		return this.name;
+	}
+} 
