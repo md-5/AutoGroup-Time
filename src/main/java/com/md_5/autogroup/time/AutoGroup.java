@@ -67,7 +67,12 @@ public class AutoGroup extends JavaPlugin {
         }
 
         if ((cmd.getName().equalsIgnoreCase("playtime")) && (args.length >= 1)){
-            Player player = getServer().getPlayer(args[0]);
+//        	if(!(sender.hasPermission("autogroup.playtime.others"))) {
+//        		sender.sendMessage("You do not have permission to check others times.");
+//                return true;
+//        	}
+        	
+            Player player = getServer().getOfflinePlayer(args[0]);
             PlayerData p = database.load(player.getName());
 
             int secs = p.getPlayTime();
