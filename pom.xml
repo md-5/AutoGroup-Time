@@ -26,7 +26,7 @@
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.2.3-R0.3-SNAPSHOT</version>
+            <version>1.2.5-R2.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
