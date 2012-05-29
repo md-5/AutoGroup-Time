@@ -41,56 +41,61 @@ public class AutoGroup extends JavaPlugin{
 
 	public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args){
 
-		if ((cmd.getName().equalsIgnoreCase("playtime")) && (args.length < 1)){
+		if (cmd.getName().equalsIgnoreCase("playtime"))  {
+			// No arguments...
+
+			if (args.length < 1)  {
+
+				if (!(sender instanceof Player)){
+					sender.sendMessage("This command can only be used in-game.");
+					return true;
+				}
+
+				Player player = (Player)sender;
+				PlayerData pd = database.load(player.getName());
+
+				int secs = pd.getPlayTime();
+
+				int hours = secs / 3600;
+				int remainder = secs % 3600;
+				int minutes = remainder / 60;
+//				int seconds = remainder % 60;
+
+				String disHour = (hours < 10 ? "0" : "") + hours;
+				String disMinu = (minutes < 10 ? "0" : "") + minutes;
+//				String disSec = (seconds < 10 ? "0" : "") + seconds;
+
+				player.sendMessage(org.bukkit.ChatColor.GOLD + "You have been playing for " 
+						+ disHour + ":" + disMinu + " hour(s)");
+
+			}else{
+			   //  Has arguments
+				if(!(sender.hasPermission("autogroup.playtime.others"))) {
+					sender.sendMessage("You cannot check the playtime of others");
+					return true;
+				}
 			
-			if (!(sender instanceof Player)){
-				sender.sendMessage("This command can only be used in-game.");
-				return true;
-			}
+				for(Player player : getServer().matchPlayer(args[0])){
+					PlayerData pd = database.load(player.getName());
 
-			Player player = (Player)sender;
-			PlayerData pd = database.load(player.getName());
+					int secs = pd.getPlayTime();
 
-			int secs = pd.getPlayTime();
+					int hours = secs / 3600;
+					int remainder = secs % 3600;
+					int minutes = remainder / 60;
+//					int seconds = remainder % 60;
 
-			int hours = secs / 3600;
-			int remainder = secs % 3600;
-			int minutes = remainder / 60;
-			int seconds = remainder % 60;
+					String disHour = (hours < 10 ? "0" : "") + hours;
+					String disMinu = (minutes < 10 ? "0" : "") + minutes;
+//					String disSec = (seconds < 10 ? "0" : "") + seconds;
 
-			String disHour = (hours < 10 ? "0" : "") + hours;
-			String disMinu = (minutes < 10 ? "0" : "") + minutes;
-			String disSec = (seconds < 10 ? "0" : "") + seconds;
-
-			player.sendMessage(org.bukkit.ChatColor.GOLD + "You have been playing for " + disHour + ":" + disMinu + " hour(s)");
-
-			return true;
-		}
-
-		if ((cmd.getName().equalsIgnoreCase("playtime")) && (args.length >= 1)){
+					sender.sendMessage(org.bukkit.ChatColor.GOLD + player.getName() + " has been playing for "
+							+ disHour + ":" + disMinu + " hour(s)");
 			
-//			if(!(sender.hasPermission("autogroup.playtime.others"))) {
-//				sender.sendMessage("You cannot check the playtime of others");
-//				return true;
-//			}
+				}
 			
-			Player player = getServer().getPlayer(args[0]);
-			PlayerData pd = database.load(player.getName());
-
-			int secs = pd.getPlayTime();
-
-			int hours = secs / 3600;
-			int remainder = secs % 3600;
-			int minutes = remainder / 60;
-			int seconds = remainder % 60;
-
-			String disHour = (hours < 10 ? "0" : "") + hours;
-			String disMinu = (minutes < 10 ? "0" : "") + minutes;
-			String disSec = (seconds < 10 ? "0" : "") + seconds;
-
-			sender.sendMessage(org.bukkit.ChatColor.GOLD + player.getName() + " has been playing for " + disHour + ":" + disMinu + " hour(s)");
-
-			return true;
+			
+			}  // end of 'has arguments.'
 		}
 
 		return true;

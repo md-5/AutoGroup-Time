@@ -1,6 +1,6 @@
 # AutoGroup config
 # Promotion command.
-# %1$s == glayername
+# %1$s == playername
 # %2$s == group
 command: permissions player setgroup %1$s %2$s
 
